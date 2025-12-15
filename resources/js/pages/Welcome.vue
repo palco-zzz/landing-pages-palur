@@ -188,7 +188,7 @@ const closeModal = () => {
 
 const getWhatsAppUrl = (title: string) => {
     const message = `Halo Admin Bakmi Jowo Palur, saya mau pesan ${title}. Apakah tersedia?`;
-    return `https://wa.me/6281234567890?text=${encodeURIComponent(message)}`;
+    return `https://wa.me/6289652431182?text=${encodeURIComponent(message)}`;
 };
 
 const scrollTo = (id: string) => {
@@ -502,7 +502,7 @@ const scrollTo = (id: string) => {
                                 </div>
                                 <div>
                                     <h4 class="text-white font-medium mb-1">Kontak</h4>
-                                    <p class="text-sm text-zinc-400">+62 812-3456-7890</p>
+                                    <p class="text-sm text-zinc-400">+62 896-5243-1182</p>
                                 </div>
                             </div>
                         </div>
@@ -532,6 +532,15 @@ const scrollTo = (id: string) => {
                         </a>
                         <a href="#" class="text-zinc-500 hover:text-white transition-colors" aria-label="Facebook">
                             <Facebook class="w-5 h-5" />
+                        </a>
+                        <a href="https://www.tiktok.com/@bakmimielethekpalur?is_from_webapp=1&sender_device=pc"
+                            target="_blank" class="text-zinc-500 hover:text-white transition-colors"
+                            aria-label="TikTok">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" />
+                            </svg>
                         </a>
                     </div>
                 </div>
