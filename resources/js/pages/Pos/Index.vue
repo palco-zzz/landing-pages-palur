@@ -7,6 +7,7 @@ import { Search, Plus, Minus, Trash2, ShoppingCart, UtensilsCrossed, Clock, User
 // Layout & Components
 import AppLayout from '@/layouts/AppLayout.vue';
 import CheckoutDialog from './CheckoutDialog.vue';
+import ReceiptHandler from './ReceiptHandler.vue';
 import { type BreadcrumbItem } from '@/types';
 
 // Shadcn UI Components
@@ -617,7 +618,7 @@ const getCartQuantity = (menuId: number): number => {
                                 <span class="text-slate-500">Item sebelumnya</span>
                                 <span class="text-slate-500">
                                     Rp {{formatPrice(existingItemsOnly.reduce((sum, item) => sum + (item.menu.price *
-                                    item.quantity), 0)) }}
+                                        item.quantity), 0))}}
                                 </span>
                             </div>
                             <div v-if="hasNewItems" class="flex items-center justify-between mb-2 text-sm">
@@ -625,8 +626,8 @@ const getCartQuantity = (menuId: number): number => {
                                     'Subtotal' }}</span>
                                 <span class="text-orange-600 font-medium">
                                     Rp {{formatPrice(newItemsOnly.reduce((sum, item) => sum + (item.menu.price *
-                                    item.quantity),
-                                    0)) }}
+                                        item.quantity),
+                                        0))}}
                                 </span>
                             </div>
                             <div
@@ -680,6 +681,9 @@ const getCartQuantity = (menuId: number): number => {
             <!-- Checkout Dialog -->
             <CheckoutDialog v-model:open="isCheckoutOpen" :transaction="selectedTransaction"
                 @success="onCheckoutSuccess" />
+
+            <!-- Receipt Printer Handler -->
+            <ReceiptHandler />
         </div>
     </AppLayout>
 </template>

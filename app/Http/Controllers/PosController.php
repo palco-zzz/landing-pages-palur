@@ -35,6 +35,41 @@ class PosController extends Controller
     }
 
     /**
+     * Format receipt data for printing.
+     */
+    private function formatReceipt(Transaction $transaction, array $items, string $type, array $extra = []): array
+    {
+        $receiptData = [
+            'type' => $type,
+            'title' => $type === 'kitchen' ? 'PESANAN DAPUR' : 'STRUK PEMBAYARAN',
+            'subtitle' => $extra['subtitle'] ?? null,
+            'store_name' => 'Bakmi Jowo Palur',
+            'date' => now()->format('d/m/Y H:i'),
+            'cashier' => auth()->user()->name ?? 'Kasir',
+            'customer_name' => $transaction->customer_name,
+            'order_number' => $transaction->uuid ? substr($transaction->uuid, 0, 8) : $transaction->id,
+            'items' => collect($items)->map(function ($item) {
+                return [
+                    'name' => $item['menu_name'] ?? ($item['menu']['name'] ?? 'Item'),
+                    'qty' => $item['quantity'],
+                    'price' => $item['price'],
+                    'subtotal' => $item['subtotal'],
+                ];
+            })->toArray(),
+            'total' => $transaction->total_amount,
+        ];
+
+        // Add payment info for customer receipts
+        if ($type === 'customer') {
+            $receiptData['payment_method'] = $extra['payment_method'] ?? null;
+            $receiptData['cash_received'] = $extra['cash_received'] ?? null;
+            $receiptData['change'] = $extra['change'] ?? null;
+        }
+
+        return $receiptData;
+    }
+
+    /**
      * Store a new order/transaction.
      */
     public function store(Request $request)
@@ -59,9 +94,12 @@ class PosController extends Controller
                 'total_amount' => 0,
             ]);
 
+            $createdItems = [];
+
             // Create transaction items
             foreach ($request->items as $item) {
-                TransactionItem::create([
+                $menu = Menu::find($item['menu_id']);
+                $transactionItem = TransactionItem::create([
                     'transaction_id' => $transaction->id,
                     'menu_id' => $item['menu_id'],
                     'quantity' => $item['quantity'],
@@ -69,6 +107,13 @@ class PosController extends Controller
                     'subtotal' => $item['subtotal'],
                     'is_printed' => false,
                 ]);
+
+                $createdItems[] = [
+                    'menu_name' => $menu->name,
+                    'quantity' => $item['quantity'],
+                    'price' => $item['price'],
+                    'subtotal' => $item['subtotal'],
+                ];
             }
 
             // Recalculate total
@@ -76,7 +121,12 @@ class PosController extends Controller
 
             DB::commit();
 
-            return redirect()->back()->with('success', "Pesanan untuk {$request->customer_name} berhasil dibuat!");
+            // Prepare print job for kitchen
+            $printJob = $this->formatReceipt($transaction, $createdItems, 'kitchen');
+
+            return redirect()->back()
+                ->with('success', "Pesanan untuk {$request->customer_name} berhasil dibuat!")
+                ->with('print_job', $printJob);
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -146,8 +196,11 @@ class PosController extends Controller
         try {
             DB::beginTransaction();
 
+            $createdItems = [];
+
             // Add new items to the transaction
             foreach ($request->items as $item) {
+                $menu = Menu::find($item['menu_id']);
                 TransactionItem::create([
                     'transaction_id' => $transaction->id,
                     'menu_id' => $item['menu_id'],
@@ -156,6 +209,13 @@ class PosController extends Controller
                     'subtotal' => $item['subtotal'],
                     'is_printed' => false, // New items need to be printed
                 ]);
+
+                $createdItems[] = [
+                    'menu_name' => $menu->name,
+                    'quantity' => $item['quantity'],
+                    'price' => $item['price'],
+                    'subtotal' => $item['subtotal'],
+                ];
             }
 
             // Recalculate total
@@ -163,7 +223,14 @@ class PosController extends Controller
 
             DB::commit();
 
-            return redirect()->back()->with('success', "Tambahan pesanan untuk {$transaction->customer_name} berhasil!");
+            // Prepare print job for kitchen with TAMBAHAN label
+            $printJob = $this->formatReceipt($transaction, $createdItems, 'kitchen', [
+                'subtitle' => '** TAMBAHAN **',
+            ]);
+
+            return redirect()->back()
+                ->with('success', "Tambahan pesanan untuk {$transaction->customer_name} berhasil!")
+                ->with('print_job', $printJob);
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -187,22 +254,49 @@ class PosController extends Controller
         ]);
 
         // For cash payments, validate sufficient amount
-        if ($request->payment_method === 'cash' && $request->cash_received) {
-            if ($request->cash_received < $transaction->total_amount) {
+        $cashReceived = $request->cash_received ?? 0;
+        $change = 0;
+
+        if ($request->payment_method === 'cash' && $cashReceived) {
+            if ($cashReceived < $transaction->total_amount) {
                 return redirect()->back()->with('error', 'Uang yang diterima kurang dari total transaksi.');
             }
+            $change = $cashReceived - $transaction->total_amount;
         }
 
+        // Load items for receipt
+        $transaction->load('items.menu');
+
+        $allItems = $transaction->items->map(function ($item) {
+            return [
+                'menu_name' => $item->menu->name,
+                'quantity' => $item->quantity,
+                'price' => $item->price,
+                'subtotal' => $item->subtotal,
+            ];
+        })->toArray();
+
+        // Mark as paid
         $transaction->markAsPaid($request->payment_method);
+
+        // Mark all items as printed
+        $transaction->items()->update(['is_printed' => true]);
 
         $message = "Pembayaran untuk {$transaction->customer_name} berhasil! Total: Rp " . number_format($transaction->total_amount, 0, ',', '.');
 
-        // Add change info for cash payments
-        if ($request->payment_method === 'cash' && $request->cash_received) {
-            $change = $request->cash_received - $transaction->total_amount;
+        if ($request->payment_method === 'cash' && $cashReceived) {
             $message .= " | Kembalian: Rp " . number_format($change, 0, ',', '.');
         }
 
-        return redirect()->back()->with('success', $message);
+        // Prepare customer receipt
+        $printJob = $this->formatReceipt($transaction, $allItems, 'customer', [
+            'payment_method' => $request->payment_method,
+            'cash_received' => $cashReceived ?: null,
+            'change' => $change ?: null,
+        ]);
+
+        return redirect()->back()
+            ->with('success', $message)
+            ->with('print_job', $printJob);
     }
 }

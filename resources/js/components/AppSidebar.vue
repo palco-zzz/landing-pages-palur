@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
 import NavUser from '@/components/NavUser.vue';
@@ -12,23 +13,47 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
-import { Link } from '@inertiajs/vue3';
-import { BookOpen, Folder, LayoutGrid, Store } from 'lucide-vue-next';
+import { Link, usePage } from '@inertiajs/vue3';
+import { BookOpen, Folder, LayoutGrid, Store, Utensils, History } from 'lucide-vue-next';
 import { route } from 'ziggy-js';
 import AppLogo from './AppLogo.vue';
 
-const mainNavItems: NavItem[] = [
-    {
-        title: 'Dashboard',
-        href: route('dashboard'),
-        icon: LayoutGrid,
-    },
-    {
-        title: 'POS System',
-        href: route('pos.index'),
-        icon: Store,
-    },
-];
+// Get current user
+const page = usePage();
+const user = computed(() => (page.props.auth as { user: { role?: string } })?.user);
+const isAdmin = computed(() => user.value?.role === 'admin');
+
+// Main nav items
+const mainNavItems = computed<NavItem[]>(() => {
+    const items: NavItem[] = [
+        {
+            title: 'Dashboard',
+            href: route('dashboard'),
+            icon: LayoutGrid,
+        },
+        {
+            title: 'POS System',
+            href: route('pos.index'),
+            icon: Store,
+        },
+        {
+            title: 'Riwayat Transaksi',
+            href: route('history.index'),
+            icon: History,
+        },
+    ];
+
+    // Admin-only items
+    if (isAdmin.value) {
+        items.push({
+            title: 'Manajemen Menu',
+            href: route('menus.index'),
+            icon: Utensils,
+        });
+    }
+
+    return items;
+});
 
 const footerNavItems: NavItem[] = [
     {
