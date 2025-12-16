@@ -20,6 +20,8 @@ Route::middleware(['auth', 'verified'])->prefix('pos')->name('pos.')->group(func
     Route::get('/', [PosController::class, 'index'])->name('index');
     Route::post('/orders', [PosController::class, 'store'])->name('orders.store');
     Route::get('/unpaid', [PosController::class, 'unpaidOrders'])->name('unpaid');
+    Route::post('/orders/{transaction}/add', [PosController::class, 'addItem'])->name('orders.add');
+    Route::post('/orders/{transaction}/checkout', [PosController::class, 'checkout'])->name('orders.checkout');
     Route::post('/orders/{transaction}/pay', [PosController::class, 'pay'])->name('orders.pay');
     Route::post('/orders/{transaction}/cancel', [PosController::class, 'cancel'])->name('orders.cancel');
 });
