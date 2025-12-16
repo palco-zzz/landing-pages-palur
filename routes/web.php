@@ -29,6 +29,7 @@ Route::middleware(['auth', 'verified'])->prefix('pos')->name('pos.')->group(func
     Route::post('/orders/{transaction}/checkout', [PosController::class, 'checkout'])->name('orders.checkout');
     Route::post('/orders/{transaction}/pay', [PosController::class, 'pay'])->name('orders.pay');
     Route::post('/orders/{transaction}/cancel', [PosController::class, 'cancel'])->name('orders.cancel');
+    Route::delete('/item/{item}', [PosController::class, 'voidItem'])->name('void');
 });
 
 // Admin Routes

@@ -302,4 +302,55 @@ class PosController extends Controller
             ->with('success', $message)
             ->with('print_job', $printJob);
     }
+
+    /**
+     * Void/cancel an item from an order.
+     */
+    public function voidItem(TransactionItem $item)
+    {
+        // Can only void active items
+        if ($item->status !== 'active') {
+            return redirect()->back()->with('error', 'Item ini sudah dibatalkan sebelumnya.');
+        }
+
+        // Load relationships
+        $item->load('transaction', 'menu');
+        $transaction = $item->transaction;
+
+        // Can only void unpaid transactions
+        if ($transaction->status !== 'unpaid') {
+            return redirect()->back()->with('error', 'Tidak dapat membatalkan item pada transaksi yang sudah dibayar.');
+        }
+
+        // Update item status to void
+        $item->update(['status' => 'void']);
+
+        // Recalculate transaction total (only active items)
+        $newTotal = $transaction->items()
+            ->where('status', 'active')
+            ->sum('subtotal');
+        $transaction->update(['total_amount' => $newTotal]);
+
+        // Create void ticket for kitchen
+        $printJob = [
+            'type' => 'void',
+            'title' => 'VOID / BATAL',
+            'store_name' => 'Bakmi Jowo Palur',
+            'date' => now()->format('d/m/Y H:i'),
+            'cashier' => auth()->user()->name ?? 'Kasir',
+            'customer_name' => $transaction->customer_name,
+            'order_number' => $transaction->uuid ? substr($transaction->uuid, 0, 8) : $transaction->id,
+            'items' => [
+                [
+                    'name' => $item->menu->name ?? 'Item',
+                    'qty' => $item->quantity,
+                    'status' => 'DIBATALKAN',
+                ],
+            ],
+        ];
+
+        return redirect()->back()
+            ->with('success', "Item {$item->menu->name} berhasil dibatalkan!")
+            ->with('print_job', $printJob);
+    }
 }

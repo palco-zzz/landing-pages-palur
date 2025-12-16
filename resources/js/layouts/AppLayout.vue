@@ -1,9 +1,13 @@
 <script setup lang="ts">
 import { watch, computed } from 'vue';
 import { usePage } from '@inertiajs/vue3';
-import { Toaster, toast } from 'vue-sonner';
+import { toast } from 'vue-sonner';
+import { Toaster } from '@/components/ui/sonner';
 import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
 import type { BreadcrumbItemType } from '@/types';
+
+// Fallback style import (Shadcn should handle this, but just in case)
+import 'vue-sonner/style.css';
 
 interface Props {
     breadcrumbs?: BreadcrumbItemType[];
@@ -20,11 +24,12 @@ const flash = computed(() => page.props.flash as {
     error?: string;
     warning?: string;
     info?: string;
+    print_job?: unknown;
 } | undefined);
 
 watch(flash, (newFlash) => {
-    // Debug log to check if frontend receives data
-    console.log("Flash Message Received:", newFlash);
+    // Debug log - show actual content
+    console.log("Flash Content:", newFlash?.success, newFlash?.print_job);
 
     if (newFlash?.success) toast.success(newFlash.success);
     if (newFlash?.error) toast.error(newFlash.error);

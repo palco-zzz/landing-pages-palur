@@ -491,7 +491,7 @@ const scrollTo = (id: string) => {
                                 </div>
                                 <div>
                                     <h4 class="text-white font-medium mb-1">Jam Operasional</h4>
-                                    <p class="text-sm text-zinc-400">Setiap Hari: 16.00 - 23.00 WIB</p>
+                                    <p class="text-sm text-zinc-400">Setiap Hari: 15.00 - 22.00 WIB</p>
                                 </div>
                             </div>
 

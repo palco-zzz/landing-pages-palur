@@ -53,6 +53,7 @@ interface TransactionItem {
     price: number;
     subtotal: number;
     is_printed: boolean;
+    status?: 'active' | 'void';
 }
 
 interface Transaction {
@@ -69,6 +70,7 @@ interface CartItem {
     menu: Menu;
     quantity: number;
     isExisting: boolean;
+    itemId?: number; // Original TransactionItem ID for voiding
 }
 
 // Props
@@ -201,15 +203,36 @@ const selectOrder = (transaction: Transaction) => {
     selectedTransaction.value = transaction;
     customerName.value = transaction.customer_name;
 
-    // Load existing items into cart
-    cart.value = transaction.items.map(item => ({
-        menu: item.menu,
-        quantity: item.quantity,
-        isExisting: true,
-    }));
+    // Load existing items into cart (only active items)
+    cart.value = transaction.items
+        .filter(item => item.status !== 'void')
+        .map(item => ({
+            menu: item.menu,
+            quantity: item.quantity,
+            isExisting: true,
+            itemId: item.id,
+        }));
 
     // Switch to menu view (don't auto-open sheet)
     currentView.value = 'menu';
+};
+
+// Void an existing item
+const voidItem = (item: CartItem) => {
+    if (!item.itemId) return;
+
+    if (confirm('Batalkan item ini? Dapur akan diberitahu.')) {
+        router.delete(route('pos.void', { item: item.itemId }), {
+            onSuccess: () => {
+                // Remove item from cart
+                cart.value = cart.value.filter(i => i.itemId !== item.itemId);
+            },
+            onError: (errors) => {
+                console.error('Void failed:', errors);
+                alert('Gagal membatalkan item.');
+            },
+        });
+    }
 };
 
 const processOrder = () => {
@@ -559,6 +582,12 @@ const getCartQuantity = (menuId: number): number => {
                                 <div class="text-sm font-medium text-slate-500">
                                     Rp {{ formatPrice(item.menu.price * item.quantity) }}
                                 </div>
+                                <!-- Void Button -->
+                                <Button v-if="item.itemId" variant="ghost" size="icon-sm"
+                                    class="text-red-500 hover:text-red-600 hover:bg-red-100 dark:hover:bg-red-950 rounded-full"
+                                    @click="voidItem(item)">
+                                    <Trash2 class="w-4 h-4" />
+                                </Button>
                             </div>
                         </template>
 
