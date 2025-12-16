@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
 import NavUser from '@/components/NavUser.vue';
 import {
@@ -11,10 +10,12 @@ import {
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
+    SidebarGroup,
+    SidebarGroupLabel,
 } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/vue3';
-import { BookOpen, Folder, LayoutGrid, Store, Utensils, History, Users, Tags } from 'lucide-vue-next';
+import { LayoutGrid, Store, History, Utensils, Tags, Users } from 'lucide-vue-next';
 import { route } from 'ziggy-js';
 import AppLogo from './AppLogo.vue';
 
@@ -23,60 +24,41 @@ const page = usePage();
 const user = computed(() => (page.props.auth as { user: { role?: string } })?.user);
 const isAdmin = computed(() => user.value?.role === 'admin');
 
-// Main nav items
-const mainNavItems = computed<NavItem[]>(() => {
-    const items: NavItem[] = [
-        {
-            title: 'Dashboard',
-            href: route('dashboard'),
-            icon: LayoutGrid,
-        },
-        {
-            title: 'POS System',
-            href: route('pos.index'),
-            icon: Store,
-        },
-        {
-            title: 'Riwayat Transaksi',
-            href: route('history.index'),
-            icon: History,
-        },
-    ];
-
-    // Admin-only items
-    if (isAdmin.value) {
-        items.push(
-            {
-                title: 'Manajemen Menu',
-                href: route('menus.index'),
-                icon: Utensils,
-            },
-            {
-                title: 'Manajemen Kategori',
-                href: route('categories.index'),
-                icon: Tags,
-            },
-            {
-                title: 'Kelola Pegawai',
-                href: route('users.index'),
-                icon: Users,
-            }
-        );
-    }
-
-    return items;
-});
-
-const footerNavItems: NavItem[] = [
+// Operational items (visible to all)
+const operationalItems: NavItem[] = [
     {
-        title: 'Github Repo',
-        href: 'https://github.com/laravel/vue-starter-kit',
-        icon: Folder,
+        title: 'Dashboard',
+        href: route('dashboard'),
+        icon: LayoutGrid,
     },
     {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#vue',
-        icon: BookOpen,
+        title: 'POS System',
+        href: route('pos.index'),
+        icon: Store,
+    },
+    {
+        title: 'Riwayat Transaksi',
+        href: route('history.index'),
+        icon: History,
+    },
+];
+
+// Management items (admin only)
+const managementItems: NavItem[] = [
+    {
+        title: 'Daftar Menu',
+        href: route('menus.index'),
+        icon: Utensils,
+    },
+    {
+        title: 'Kategori',
+        href: route('categories.index'),
+        icon: Tags,
+    },
+    {
+        title: 'Pegawai',
+        href: route('users.index'),
+        icon: Users,
     },
 ];
 </script>
@@ -96,13 +78,21 @@ const footerNavItems: NavItem[] = [
         </SidebarHeader>
 
         <SidebarContent>
-            <NavMain :items="mainNavItems" />
+            <!-- Operational Group -->
+            <SidebarGroup>
+                <SidebarGroupLabel>Operasional Warung</SidebarGroupLabel>
+                <NavMain :items="operationalItems" />
+            </SidebarGroup>
+
+            <!-- Management Group (Admin Only) -->
+            <SidebarGroup v-if="isAdmin">
+                <SidebarGroupLabel>Manajemen & Admin</SidebarGroupLabel>
+                <NavMain :items="managementItems" />
+            </SidebarGroup>
         </SidebarContent>
 
         <SidebarFooter>
-            <NavFooter :items="footerNavItems" />
             <NavUser />
         </SidebarFooter>
     </Sidebar>
-    <slot />
 </template>

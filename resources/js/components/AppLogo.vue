@@ -1,16 +1,13 @@
 <script setup lang="ts">
-import AppLogoIcon from '@/components/AppLogoIcon.vue';
+import { UtensilsCrossed } from 'lucide-vue-next';
 </script>
 
 <template>
-    <div
-        class="flex aspect-square size-8 items-center justify-center rounded-md bg-sidebar-primary text-sidebar-primary-foreground"
-    >
-        <AppLogoIcon class="size-5 fill-current text-white dark:text-black" />
+    <div class="flex aspect-square size-8 items-center justify-center rounded-lg bg-zinc-900 text-amber-500">
+        <UtensilsCrossed class="size-5" />
     </div>
-    <div class="ml-1 grid flex-1 text-left text-sm">
-        <span class="mb-0.5 truncate leading-tight font-semibold"
-            >Laravel Starter Kit</span
-        >
+    <div class="ml-2 grid flex-1 text-left text-sm leading-tight">
+        <span class="truncate font-semibold">Bakmi Jowo Palur</span>
+        <span class="truncate text-xs text-muted-foreground">Authentic & Tanpa Micin</span>
     </div>
 </template>
