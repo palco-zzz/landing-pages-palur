@@ -5,7 +5,9 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HistoryController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\PosController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\UserController;
+use App\Http\Middleware\EnsureUserIsAdmin;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
@@ -20,7 +22,7 @@ Route::get('dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
-// POS Routes (Protected)
+// POS Routes (Protected - All authenticated users)
 Route::middleware(['auth', 'verified'])->prefix('pos')->name('pos.')->group(function () {
     Route::get('/', [PosController::class, 'index'])->name('index');
     Route::post('/orders', [PosController::class, 'store'])->name('orders.store');
@@ -32,13 +34,24 @@ Route::middleware(['auth', 'verified'])->prefix('pos')->name('pos.')->group(func
     Route::delete('/item/{item}', [PosController::class, 'voidItem'])->name('void');
 });
 
-// Admin Routes
+// Transaction History (All authenticated users)
 Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/history', [HistoryController::class, 'index'])->name('history.index');
+});
+
+// Admin-Only Routes (Protected by EnsureUserIsAdmin middleware)
+Route::middleware(['auth', 'verified', EnsureUserIsAdmin::class])->group(function () {
+    // Menu Management
     Route::resource('menus', MenuController::class)->except(['show', 'create', 'edit']);
     Route::resource('categories', CategoryController::class)->except(['show', 'create', 'edit']);
-    Route::get('/history', [HistoryController::class, 'index'])->name('history.index');
+
+    // User Management
     Route::resource('users', UserController::class)->except(['show', 'create', 'edit']);
+
+    // Reports
+    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+    Route::get('/reports/export-pdf', [ReportController::class, 'exportPdf'])->name('reports.export-pdf');
+    Route::get('/reports/export-excel', [ReportController::class, 'exportExcel'])->name('reports.export-excel');
 });
 
 require __DIR__.'/settings.php';
-

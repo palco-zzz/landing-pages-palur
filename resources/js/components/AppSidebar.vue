@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/vue3';
-import { LayoutGrid, Store, History, Utensils, Tags, Users } from 'lucide-vue-next';
+import { LayoutGrid, Store, History, Utensils, Tags, Users, BarChart3 } from 'lucide-vue-next';
 import { route } from 'ziggy-js';
 import AppLogo from './AppLogo.vue';
 
@@ -59,6 +59,11 @@ const managementItems: NavItem[] = [
         title: 'Pegawai',
         href: route('users.index'),
         icon: Users,
+    },
+    {
+        title: 'Laporan',
+        href: route('reports.index'),
+        icon: BarChart3,
     },
 ];
 </script>
