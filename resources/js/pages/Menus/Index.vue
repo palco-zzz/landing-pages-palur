@@ -24,6 +24,7 @@ import {
 import {
     Dialog,
     DialogContent,
+    DialogDescription,
     DialogHeader,
     DialogTitle,
     DialogFooter,
@@ -255,6 +256,9 @@ const deleteMenu = () => {
             <DialogContent class="sm:max-w-md">
                 <DialogHeader>
                     <DialogTitle>{{ dialogTitle }}</DialogTitle>
+                    <DialogDescription class="sr-only">
+                        Isi detail menu baru atau edit menu yang ada.
+                    </DialogDescription>
                 </DialogHeader>
 
                 <form @submit.prevent="submitForm" class="space-y-4">
@@ -321,6 +325,9 @@ const deleteMenu = () => {
             <DialogContent class="sm:max-w-sm">
                 <DialogHeader>
                     <DialogTitle>Hapus Menu?</DialogTitle>
+                    <DialogDescription class="sr-only">
+                        Konfirmasi penghapusan menu.
+                    </DialogDescription>
                 </DialogHeader>
                 <p class="text-sm text-slate-600 dark:text-slate-400">
                     Apakah Anda yakin ingin menghapus menu ini? Tindakan ini tidak dapat dibatalkan.

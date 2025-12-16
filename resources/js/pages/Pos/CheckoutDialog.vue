@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import {
     Dialog,
     DialogContent,
+    DialogDescription,
     DialogHeader,
     DialogTitle,
     DialogFooter,
@@ -127,6 +128,9 @@ watch(() => props.open, (isOpen) => {
                 <DialogTitle class="text-xl">
                     Pembayaran - {{ transaction?.customer_name }}
                 </DialogTitle>
+                <DialogDescription class="sr-only">
+                    Review total tagihan dan pilih metode pembayaran.
+                </DialogDescription>
             </DialogHeader>
 
             <div class="space-y-6 py-4">

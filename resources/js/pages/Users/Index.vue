@@ -24,6 +24,7 @@ import {
 import {
     Dialog,
     DialogContent,
+    DialogDescription,
     DialogHeader,
     DialogTitle,
     DialogFooter,
@@ -252,6 +253,9 @@ const deleteUser = () => {
             <DialogContent class="sm:max-w-md">
                 <DialogHeader>
                     <DialogTitle>{{ dialogTitle }}</DialogTitle>
+                    <DialogDescription class="sr-only">
+                        Kelola data akses pegawai di sini.
+                    </DialogDescription>
                 </DialogHeader>
 
                 <form @submit.prevent="submitForm" class="space-y-4">
@@ -308,6 +312,9 @@ const deleteUser = () => {
             <DialogContent class="sm:max-w-sm">
                 <DialogHeader>
                     <DialogTitle>Hapus Pengguna?</DialogTitle>
+                    <DialogDescription class="sr-only">
+                        Konfirmasi penghapusan pengguna.
+                    </DialogDescription>
                 </DialogHeader>
                 <p class="text-sm text-slate-600 dark:text-slate-400">
                     Apakah Anda yakin ingin menghapus pengguna ini? Tindakan ini tidak dapat dibatalkan.

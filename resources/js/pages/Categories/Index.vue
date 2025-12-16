@@ -24,6 +24,7 @@ import {
 import {
     Dialog,
     DialogContent,
+    DialogDescription,
     DialogHeader,
     DialogTitle,
     DialogFooter,
@@ -196,6 +197,9 @@ const deleteCategory = () => {
             <DialogContent class="sm:max-w-md">
                 <DialogHeader>
                     <DialogTitle>{{ dialogTitle }}</DialogTitle>
+                    <DialogDescription class="sr-only">
+                        Tambahkan atau ubah nama kategori menu.
+                    </DialogDescription>
                 </DialogHeader>
 
                 <form @submit.prevent="submitForm" class="space-y-4">
@@ -221,6 +225,9 @@ const deleteCategory = () => {
             <DialogContent class="sm:max-w-sm">
                 <DialogHeader>
                     <DialogTitle>Hapus Kategori?</DialogTitle>
+                    <DialogDescription class="sr-only">
+                        Konfirmasi penghapusan kategori.
+                    </DialogDescription>
                 </DialogHeader>
                 <p class="text-sm text-slate-600 dark:text-slate-400">
                     Apakah Anda yakin ingin menghapus kategori ini?
