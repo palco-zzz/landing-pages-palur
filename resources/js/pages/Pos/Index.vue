@@ -32,13 +32,18 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 // Types
+interface Category {
+    id: number;
+    name: string;
+}
+
 interface Menu {
     id: number;
     name: string;
-    category: 'makanan' | 'minuman' | 'tambahan';
+    category_id: number;
+    category: Category | null;
     price: number;
     image: string | null;
-    is_available: boolean;
 }
 
 interface TransactionItem {
@@ -69,6 +74,7 @@ interface CartItem {
 // Props
 const props = defineProps<{
     menus: Menu[];
+    categories: Category[];
     activeOrders: Transaction[];
 }>();
 
@@ -83,20 +89,18 @@ const isProcessing = ref(false);
 const selectedTransaction = ref<Transaction | null>(null);
 const isCheckoutOpen = ref(false);
 
-// Categories
-const categories = [
+// Dynamic categories with "All" option
+const categoryTabs = computed(() => [
     { key: 'all', label: 'Semua' },
-    { key: 'makanan', label: 'Makanan' },
-    { key: 'minuman', label: 'Minuman' },
-    { key: 'tambahan', label: 'Tambahan' },
-];
+    ...props.categories.map(cat => ({ key: cat.name, label: cat.name })),
+]);
 
 // Computed
 const filteredMenus = computed(() => {
-    let result = props.menus.filter(menu => menu.is_available);
+    let result = props.menus;
 
     if (activeCategory.value !== 'all') {
-        result = result.filter(menu => menu.category === activeCategory.value);
+        result = result.filter(menu => menu.category?.name === activeCategory.value);
     }
 
     if (searchQuery.value.trim()) {
@@ -353,7 +357,7 @@ const getCartQuantity = (menuId: number): number => {
 
                     <div class="px-4 pb-3 overflow-x-auto scrollbar-hide">
                         <div class="flex gap-2 min-w-max">
-                            <Button v-for="cat in categories" :key="cat.key"
+                            <Button v-for="cat in categoryTabs" :key="cat.key"
                                 :variant="activeCategory === cat.key ? 'default' : 'outline'" size="sm"
                                 class="rounded-full whitespace-nowrap" @click="activeCategory = cat.key">
                                 {{ cat.label }}

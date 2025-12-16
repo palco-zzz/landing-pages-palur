@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\Menu;
 use App\Models\Transaction;
 use App\Models\TransactionItem;
@@ -17,10 +18,11 @@ class PosController extends Controller
      */
     public function index(): Response
     {
-        $menus = Menu::where('is_available', true)
-            ->orderBy('category')
+        $menus = Menu::with('category')
             ->orderBy('name')
             ->get();
+
+        $categories = Category::orderBy('name')->get();
 
         $activeOrders = Transaction::with('items.menu')
             ->where('status', 'unpaid')
@@ -30,6 +32,7 @@ class PosController extends Controller
 
         return Inertia::render('Pos/Index', [
             'menus' => $menus,
+            'categories' => $categories,
             'activeOrders' => $activeOrders,
         ]);
     }

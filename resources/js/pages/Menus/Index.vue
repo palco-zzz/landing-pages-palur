@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import { Head, router, useForm, usePage } from '@inertiajs/vue3';
+import { Head, router, useForm } from '@inertiajs/vue3';
 import { route } from 'ziggy-js';
 import { Plus, Pencil, Trash2, MoreHorizontal, UtensilsCrossed, ImageIcon } from 'lucide-vue-next';
 
@@ -12,7 +12,6 @@ import { type BreadcrumbItem } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import {
     Table,
@@ -50,18 +49,24 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 // Types
+interface Category {
+    id: number;
+    name: string;
+}
+
 interface Menu {
     id: number;
     name: string;
-    category: 'makanan' | 'minuman' | 'tambahan';
+    category_id: number;
+    category: Category | null;
     price: number;
     image: string | null;
-    is_available: boolean;
 }
 
 // Props
 const props = defineProps<{
     menus: Menu[];
+    categories: Category[];
 }>();
 
 // State
@@ -73,26 +78,13 @@ const deleteConfirmId = ref<number | null>(null);
 // Form
 const form = useForm({
     name: '',
-    category: 'makanan' as 'makanan' | 'minuman' | 'tambahan',
+    category_id: '' as string | number,
     price: 0,
     image: null as File | null,
-    is_available: true,
 });
 
 // Computed
 const dialogTitle = computed(() => editingMenu.value ? 'Edit Menu' : 'Tambah Menu');
-
-const categoryLabels: Record<string, string> = {
-    makanan: 'Makanan',
-    minuman: 'Minuman',
-    tambahan: 'Tambahan',
-};
-
-const categoryColors: Record<string, string> = {
-    makanan: 'bg-orange-100 text-orange-800 border-orange-300',
-    minuman: 'bg-blue-100 text-blue-800 border-blue-300',
-    tambahan: 'bg-green-100 text-green-800 border-green-300',
-};
 
 // Methods
 const formatPrice = (price: number): string => {
@@ -102,6 +94,7 @@ const formatPrice = (price: number): string => {
 const openCreateDialog = () => {
     editingMenu.value = null;
     form.reset();
+    form.category_id = props.categories[0]?.id || '';
     imagePreview.value = null;
     isDialogOpen.value = true;
 };
@@ -109,9 +102,8 @@ const openCreateDialog = () => {
 const openEditDialog = (menu: Menu) => {
     editingMenu.value = menu;
     form.name = menu.name;
-    form.category = menu.category;
+    form.category_id = menu.category_id;
     form.price = menu.price;
-    form.is_available = menu.is_available;
     form.image = null;
     imagePreview.value = menu.image;
     isDialogOpen.value = true;
@@ -129,14 +121,12 @@ const handleImageChange = (event: Event) => {
 
 const submitForm = () => {
     if (editingMenu.value) {
-        // Update
         router.post(route('menus.update', { menu: editingMenu.value.id }), {
             _method: 'PUT',
             name: form.name,
-            category: form.category,
+            category_id: form.category_id,
             price: form.price,
             image: form.image,
-            is_available: form.is_available,
         }, {
             forceFormData: true,
             onSuccess: () => {
@@ -145,13 +135,11 @@ const submitForm = () => {
             },
         });
     } else {
-        // Create
         router.post(route('menus.store'), {
             name: form.name,
-            category: form.category,
+            category_id: form.category_id,
             price: form.price,
             image: form.image,
-            is_available: form.is_available,
         }, {
             forceFormData: true,
             onSuccess: () => {
@@ -160,10 +148,6 @@ const submitForm = () => {
             },
         });
     }
-};
-
-const toggleAvailability = (menu: Menu) => {
-    router.patch(route('menus.toggle', { menu: menu.id }));
 };
 
 const confirmDelete = (id: number) => {
@@ -210,13 +194,12 @@ const deleteMenu = () => {
                                 <TableHead>Nama</TableHead>
                                 <TableHead>Kategori</TableHead>
                                 <TableHead class="text-right">Harga</TableHead>
-                                <TableHead class="text-center">Ketersediaan</TableHead>
                                 <TableHead class="text-right w-20">Aksi</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             <TableRow v-if="menus.length === 0">
-                                <TableCell colspan="6" class="text-center py-12">
+                                <TableCell colspan="5" class="text-center py-12">
                                     <div class="flex flex-col items-center gap-2">
                                         <UtensilsCrossed class="w-12 h-12 text-slate-300" />
                                         <p class="text-slate-500">Belum ada menu</p>
@@ -234,15 +217,12 @@ const deleteMenu = () => {
                                 </TableCell>
                                 <TableCell class="font-medium">{{ menu.name }}</TableCell>
                                 <TableCell>
-                                    <Badge variant="outline" :class="categoryColors[menu.category]">
-                                        {{ categoryLabels[menu.category] }}
+                                    <Badge variant="outline" class="bg-orange-100 text-orange-800 border-orange-300">
+                                        {{ menu.category?.name || 'Tidak ada' }}
                                     </Badge>
                                 </TableCell>
                                 <TableCell class="text-right font-medium">
                                     Rp {{ formatPrice(menu.price) }}
-                                </TableCell>
-                                <TableCell class="text-center">
-                                    <Switch :checked="menu.is_available" @update:checked="toggleAvailability(menu)" />
                                 </TableCell>
                                 <TableCell class="text-right">
                                     <DropdownMenu>
@@ -287,14 +267,14 @@ const deleteMenu = () => {
                     <!-- Category -->
                     <div class="space-y-2">
                         <Label>Kategori</Label>
-                        <Select v-model="form.category">
+                        <Select v-model="form.category_id">
                             <SelectTrigger>
                                 <SelectValue placeholder="Pilih kategori" />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="makanan">Makanan</SelectItem>
-                                <SelectItem value="minuman">Minuman</SelectItem>
-                                <SelectItem value="tambahan">Tambahan</SelectItem>
+                                <SelectItem v-for="cat in categories" :key="cat.id" :value="cat.id">
+                                    {{ cat.name }}
+                                </SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
@@ -322,12 +302,6 @@ const deleteMenu = () => {
                                 <p class="text-xs text-slate-500 mt-1">JPG, PNG, atau WebP. Maks 2MB.</p>
                             </div>
                         </div>
-                    </div>
-
-                    <!-- Availability -->
-                    <div class="flex items-center justify-between py-2">
-                        <Label for="available">Tersedia untuk dijual</Label>
-                        <Switch id="available" v-model:checked="form.is_available" />
                     </div>
 
                     <DialogFooter class="gap-2">

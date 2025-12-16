@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HistoryController;
 use App\Http\Controllers\MenuController;
@@ -33,7 +34,7 @@ Route::middleware(['auth', 'verified'])->prefix('pos')->name('pos.')->group(func
 // Admin Routes
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('menus', MenuController::class)->except(['show', 'create', 'edit']);
-    Route::patch('/menus/{menu}/toggle', [MenuController::class, 'toggle'])->name('menus.toggle');
+    Route::resource('categories', CategoryController::class)->except(['show', 'create', 'edit']);
     Route::get('/history', [HistoryController::class, 'index'])->name('history.index');
     Route::resource('users', UserController::class)->except(['show', 'create', 'edit']);
 });

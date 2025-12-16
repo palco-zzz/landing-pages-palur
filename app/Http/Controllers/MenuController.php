@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\Menu;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -15,10 +16,12 @@ class MenuController extends Controller
      */
     public function index(): Response
     {
-        $menus = Menu::latest()->get();
+        $menus = Menu::with('category')->latest()->get();
+        $categories = Category::orderBy('name')->get();
 
         return Inertia::render('Menus/Index', [
             'menus' => $menus,
+            'categories' => $categories,
         ]);
     }
 
@@ -29,10 +32,9 @@ class MenuController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'category' => 'required|in:makanan,minuman,tambahan',
+            'category_id' => 'required|exists:categories,id',
             'price' => 'required|integer|min:0',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
-            'is_available' => 'boolean',
         ]);
 
         // Handle image upload
@@ -40,8 +42,6 @@ class MenuController extends Controller
             $path = $request->file('image')->store('menus', 'public');
             $validated['image'] = '/storage/' . $path;
         }
-
-        $validated['is_available'] = $request->boolean('is_available', true);
 
         Menu::create($validated);
 
@@ -55,10 +55,9 @@ class MenuController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'category' => 'required|in:makanan,minuman,tambahan',
+            'category_id' => 'required|exists:categories,id',
             'price' => 'required|integer|min:0',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
-            'is_available' => 'boolean',
         ]);
 
         // Handle image upload
@@ -72,8 +71,6 @@ class MenuController extends Controller
             $path = $request->file('image')->store('menus', 'public');
             $validated['image'] = '/storage/' . $path;
         }
-
-        $validated['is_available'] = $request->boolean('is_available', true);
 
         $menu->update($validated);
 
@@ -94,19 +91,5 @@ class MenuController extends Controller
         $menu->delete();
 
         return redirect()->back()->with('success', 'Menu berhasil dihapus!');
-    }
-
-    /**
-     * Toggle menu availability.
-     */
-    public function toggle(Menu $menu)
-    {
-        $menu->update([
-            'is_available' => !$menu->is_available,
-        ]);
-
-        $status = $menu->is_available ? 'tersedia' : 'tidak tersedia';
-
-        return redirect()->back()->with('success', "Menu {$menu->name} sekarang {$status}.");
     }
 }

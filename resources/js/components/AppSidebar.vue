@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/vue3';
-import { BookOpen, Folder, LayoutGrid, Store, Utensils, History, Users } from 'lucide-vue-next';
+import { BookOpen, Folder, LayoutGrid, Store, Utensils, History, Users, Tags } from 'lucide-vue-next';
 import { route } from 'ziggy-js';
 import AppLogo from './AppLogo.vue';
 
@@ -50,6 +50,11 @@ const mainNavItems = computed<NavItem[]>(() => {
                 title: 'Manajemen Menu',
                 href: route('menus.index'),
                 icon: Utensils,
+            },
+            {
+                title: 'Manajemen Kategori',
+                href: route('categories.index'),
+                icon: Tags,
             },
             {
                 title: 'Kelola Pegawai',
