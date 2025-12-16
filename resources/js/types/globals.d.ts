@@ -14,7 +14,7 @@ declare module 'vite/client' {
 }
 
 declare module '@inertiajs/core' {
-    interface PageProps extends InertiaPageProps, AppPageProps {}
+    interface PageProps extends InertiaPageProps, AppPageProps { }
 }
 
 declare module 'vue' {
@@ -22,5 +22,11 @@ declare module 'vue' {
         $inertia: typeof Router;
         $page: Page;
         $headManager: ReturnType<typeof createHeadManager>;
+        route: (name: string, params?: Record<string, unknown>) => string;
     }
+}
+
+// Global route function
+declare global {
+    function route(name: string, params?: Record<string, unknown>): string;
 }
