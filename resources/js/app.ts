@@ -7,6 +7,20 @@ import { createApp, h } from 'vue';
 import { ZiggyVue } from 'ziggy-js';
 import { initializeTheme } from './composables/useAppearance';
 
+// PWA Service Worker Registration
+import { registerSW } from 'virtual:pwa-register';
+
+registerSW({
+    immediate: true,
+    onNeedRefresh() {
+        // Auto updates enabled, no user prompt needed
+        console.log('PWA: New content available');
+    },
+    onOfflineReady() {
+        console.log('PWA: Ready to work offline');
+    },
+});
+
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 createInertiaApp({

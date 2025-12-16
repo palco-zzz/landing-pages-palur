@@ -479,7 +479,7 @@ const scrollTo = (id: string) => {
                                 <div>
                                     <h4 class="text-white font-medium mb-1">Alamat</h4>
                                     <p class="text-sm text-zinc-400 leading-relaxed">
-                                        Jl. Raya Palur, Palur, Kec. Mojolaban, <br>Kabupaten Sukoharjo, Jawa Tengah
+                                        JL. Raya Solo-tawangmangu no 48<br>Kabupaten Karanganyar, Jawa Tengah
                                     </p>
                                 </div>
                             </div>
