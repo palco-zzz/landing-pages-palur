@@ -1,8 +1,12 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { Head, router } from '@inertiajs/vue3';
 import { route } from 'ziggy-js';
-import { FileDown, FileSpreadsheet, TrendingUp, CreditCard, Star, BarChart3 } from 'lucide-vue-next';
+import { FileDown, FileSpreadsheet, TrendingUp, CreditCard, Star, BarChart3, CalendarRange } from 'lucide-vue-next';
+
+// VueDatePicker
+import { VueDatePicker } from '@vuepic/vue-datepicker';
+import '@vuepic/vue-datepicker/dist/main.css';
 
 // Chart.js
 import {
@@ -37,7 +41,6 @@ ChartJS.register(
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 
@@ -56,34 +59,59 @@ const props = defineProps<{
     filters: { start_date: string; end_date: string };
 }>();
 
-// Local state for filters
-const startDate = ref(props.filters.start_date);
-const endDate = ref(props.filters.end_date);
-
-// Apply filter
-const applyFilter = () => {
-    router.get(route('reports.index'), {
-        start_date: startDate.value,
-        end_date: endDate.value,
-    }, {
-        preserveState: true,
-        preserveScroll: true,
-    });
+// --- Date Range Picker State ---
+// Parse initial dates from props (YYYY-MM-DD strings)
+const parseDate = (dateStr: string): Date => {
+    const [year, month, day] = dateStr.split('-').map(Number);
+    return new Date(year, month - 1, day);
 };
 
-// Export functions
+const formatDateToYMD = (date: Date): string => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+};
+
+// Initialize dateRange with [startDate, endDate] as Date objects
+const dateRange = ref<[Date, Date] | null>([
+    parseDate(props.filters.start_date),
+    parseDate(props.filters.end_date),
+]);
+
+// Watch for date range changes and apply filter
+watch(dateRange, (newRange) => {
+    if (newRange && newRange[0] && newRange[1]) {
+        const startDate = formatDateToYMD(newRange[0]);
+        const endDate = formatDateToYMD(newRange[1]);
+
+        router.get(route('reports.index'), {
+            start_date: startDate,
+            end_date: endDate,
+        }, {
+            preserveState: true,
+            preserveScroll: true,
+        });
+    }
+});
+
+// Export functions (use current range values)
 const exportPdf = () => {
-    window.open(route('reports.export-pdf', {
-        start_date: startDate.value,
-        end_date: endDate.value,
-    }));
+    if (dateRange.value) {
+        window.open(route('reports.export-pdf', {
+            start_date: formatDateToYMD(dateRange.value[0]),
+            end_date: formatDateToYMD(dateRange.value[1]),
+        }));
+    }
 };
 
 const exportExcel = () => {
-    window.open(route('reports.export-excel', {
-        start_date: startDate.value,
-        end_date: endDate.value,
-    }));
+    if (dateRange.value) {
+        window.open(route('reports.export-excel', {
+            start_date: formatDateToYMD(dateRange.value[0]),
+            end_date: formatDateToYMD(dateRange.value[1]),
+        }));
+    }
 };
 
 // Chart data - Hourly Trend (Bar Chart)
@@ -171,19 +199,26 @@ const formatPrice = (price: number): string => {
                 </div>
 
                 <div class="flex flex-wrap items-end gap-3">
-                    <!-- Date Filters -->
-                    <div class="flex items-center gap-2">
-                        <div>
-                            <Label for="start_date" class="text-xs">Dari</Label>
-                            <Input id="start_date" type="date" v-model="startDate" class="w-36" />
-                        </div>
-                        <div>
-                            <Label for="end_date" class="text-xs">Sampai</Label>
-                            <Input id="end_date" type="date" v-model="endDate" class="w-36" />
-                        </div>
-                        <Button @click="applyFilter" class="mt-5">
-                            Filter
-                        </Button>
+                    <!-- Date Range Picker -->
+                    <div class="flex flex-col">
+                        <Label class="text-xs mb-1.5 flex items-center gap-1.5">
+                            <CalendarRange class="w-3.5 h-3.5" />
+                            Periode Laporan
+                        </Label>
+                        <VueDatePicker
+                            v-model="dateRange"
+                            range
+                            :dark="true"
+                            format="dd/MM/yyyy"
+                            :enable-time-picker="false"
+                            placeholder="Pilih Rentang Tanggal"
+                            :auto-apply="true"
+                            :close-on-auto-apply="true"
+                            input-class-name="!bg-zinc-800 !border-zinc-600 !text-zinc-100 !rounded-lg !h-10 !text-sm"
+                            menu-class-name="!bg-zinc-800 !border-zinc-700"
+                            calendar-cell-class-name="hover:!bg-orange-500/20"
+                            :style="{ minWidth: '260px' }"
+                        />
                     </div>
 
                     <!-- Export Buttons -->
@@ -353,3 +388,24 @@ const formatPrice = (price: number): string => {
         </div>
     </AppLayout>
 </template>
+
+<style>
+/* VueDatePicker Dark Mode Overrides */
+.dp__theme_dark {
+    --dp-background-color: #27272a;
+    --dp-text-color: #f4f4f5;
+    --dp-hover-color: #3f3f46;
+    --dp-hover-text-color: #f4f4f5;
+    --dp-primary-color: #f97316;
+    --dp-primary-text-color: #fff;
+    --dp-secondary-color: #52525b;
+    --dp-border-color: #52525b;
+    --dp-menu-border-color: #3f3f46;
+    --dp-input-border-color: #52525b;
+    --dp-success-color: #22c55e;
+    --dp-success-color-disabled: #16a34a;
+    --dp-icon-color: #a1a1aa;
+    --dp-range-between-dates-background-color: rgba(249, 115, 22, 0.2);
+    --dp-range-between-dates-text-color: #f4f4f5;
+}
+</style>
