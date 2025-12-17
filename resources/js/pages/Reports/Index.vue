@@ -2,7 +2,17 @@
 import { ref, computed, watch } from 'vue';
 import { Head, router } from '@inertiajs/vue3';
 import { route } from 'ziggy-js';
-import { FileDown, FileSpreadsheet, TrendingUp, CreditCard, Star, BarChart3, CalendarRange } from 'lucide-vue-next';
+import {
+    FileDown,
+    FileSpreadsheet,
+    TrendingUp,
+    CreditCard,
+    Star,
+    BarChart3,
+    CalendarRange,
+    Calendar,
+    Download
+} from 'lucide-vue-next';
 
 // VueDatePicker
 import { VueDatePicker } from '@vuepic/vue-datepicker';
@@ -78,6 +88,35 @@ const dateRange = ref<[Date, Date] | null>([
     parseDate(props.filters.start_date),
     parseDate(props.filters.end_date),
 ]);
+
+// Helper to apply presets
+const applyPreset = (type: 'today' | 'this_month' | 'last_7_days') => {
+    const today = new Date();
+    let start = new Date();
+    let end = new Date();
+
+    if (type === 'today') {
+        // [today, today]
+        // No change needed for start/end as they are already today
+    } else if (type === 'this_month') {
+        // [startOfMonth, today]
+        start = new Date(today.getFullYear(), today.getMonth(), 1);
+    } else if (type === 'last_7_days') {
+        // [today - 7, today]
+        start.setDate(today.getDate() - 7);
+    }
+
+    dateRange.value = [start, end];
+};
+
+// Helper for trigger display
+const formatDateTrigger = (dates: Date[]) => {
+    if (!dates || dates.length < 2) return 'Pilih Tanggal';
+    const start = dates[0];
+    const end = dates[1];
+    const options: Intl.DateTimeFormatOptions = { day: '2-digit', month: 'short', year: 'numeric' };
+    return `${start.toLocaleDateString('id-ID', options)} - ${end.toLocaleDateString('id-ID', options)}`;
+};
 
 // Watch for date range changes and apply filter
 watch(dateRange, (newRange) => {
@@ -187,51 +226,66 @@ const formatPrice = (price: number): string => {
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex flex-col gap-6 p-4 md:p-6">
-            <!-- Header with Filters & Export -->
-            <div class="flex flex-col md:flex-row md:items-end gap-4 justify-between">
-                <div>
-                    <h1 class="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">
-                        Laporan & Analitik
-                    </h1>
-                    <p class="text-slate-500 dark:text-slate-400 mt-1">
-                        Pantau performa warung dengan data real-time
-                    </p>
+            <!-- Header Title -->
+            <div class="flex flex-col">
+                <h1 class="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">
+                    Laporan & Analitik
+                </h1>
+                <p class="text-slate-500 dark:text-slate-400 mt-1">
+                    Pantau performa warung dengan data real-time
+                </p>
+            </div>
+
+            <!-- CONTROL BAR (Filter & Actions) -->
+            <div
+                class="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-5 mb-2 flex flex-col md:flex-row justify-between md:items-end gap-4 backdrop-blur-sm">
+                <!-- Left: Filter Logic -->
+                <div class="flex flex-col gap-3 w-full md:w-auto">
+                    <div class="flex items-center gap-3">
+                        <Label class="text-zinc-400 text-xs font-medium uppercase tracking-wider">Periode
+                            Laporan</Label>
+                        <!-- Quick Chips -->
+                        <div class="flex gap-2">
+                            <button @click="applyPreset('today')" type="button"
+                                class="text-[10px] px-2 py-1 rounded-md bg-zinc-800 hover:bg-zinc-700 text-zinc-300 transition border border-zinc-700">
+                                Hari Ini
+                            </button>
+                            <button @click="applyPreset('this_month')" type="button"
+                                class="text-[10px] px-2 py-1 rounded-md bg-zinc-800 hover:bg-zinc-700 text-zinc-300 transition border border-zinc-700">
+                                Bulan Ini
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Date Picker -->
+                    <VueDatePicker v-model="dateRange" range :dark="true" format="dd MMM yyyy"
+                        :enable-time-picker="false" :auto-apply="true" :close-on-auto-apply="true"
+                        menu-class-name="!bg-zinc-900 !border-zinc-800 !rounded-xl"
+                        calendar-cell-class-name="hover:!bg-orange-500/20 rounded-full" :style="{ minWidth: '260px' }">
+                        <template #trigger>
+                            <div
+                                class="bg-black/40 border border-zinc-700 hover:border-orange-500/50 text-white rounded-xl px-4 py-2.5 flex items-center justify-between gap-3 cursor-pointer transition group w-full md:w-[280px]">
+                                <span class="text-sm font-medium text-zinc-200">
+                                    {{ dateRange ? formatDateTrigger(dateRange) : 'Pilih Rentang Tanggal' }}
+                                </span>
+                                <Calendar class="w-4 h-4 text-zinc-500 group-hover:text-orange-500 transition-colors" />
+                            </div>
+                        </template>
+                    </VueDatePicker>
                 </div>
 
-                <div class="flex flex-wrap items-end gap-3">
-                    <!-- Date Range Picker -->
-                    <div class="flex flex-col">
-                        <Label class="text-xs mb-1.5 flex items-center gap-1.5">
-                            <CalendarRange class="w-3.5 h-3.5" />
-                            Periode Laporan
-                        </Label>
-                        <VueDatePicker
-                            v-model="dateRange"
-                            range
-                            :dark="true"
-                            format="dd/MM/yyyy"
-                            :enable-time-picker="false"
-                            placeholder="Pilih Rentang Tanggal"
-                            :auto-apply="true"
-                            :close-on-auto-apply="true"
-                            input-class-name="!bg-zinc-800 !border-zinc-600 !text-zinc-100 !rounded-lg !h-10 !text-sm"
-                            menu-class-name="!bg-zinc-800 !border-zinc-700"
-                            calendar-cell-class-name="hover:!bg-orange-500/20"
-                            :style="{ minWidth: '260px' }"
-                        />
-                    </div>
-
-                    <!-- Export Buttons -->
-                    <div class="flex gap-2">
-                        <Button variant="destructive" @click="exportPdf">
-                            <FileDown class="w-4 h-4 mr-2" />
-                            PDF
-                        </Button>
-                        <Button class="bg-green-600 hover:bg-green-700 text-white" @click="exportExcel">
-                            <FileSpreadsheet class="w-4 h-4 mr-2" />
-                            Excel
-                        </Button>
-                    </div>
+                <!-- Right: Actions -->
+                <div class="flex flex-row gap-3 w-full md:w-auto">
+                    <Button @click="exportPdf" variant="outline"
+                        class="flex-1 md:flex-none bg-red-500/10 text-red-500 border-red-500/20 hover:bg-red-500 hover:text-white hover:border-red-500 transition-all rounded-xl">
+                        <Download class="w-4 h-4 mr-2" />
+                        PDF
+                    </Button>
+                    <Button @click="exportExcel" variant="outline"
+                        class="flex-1 md:flex-none bg-emerald-500/10 text-emerald-500 border-emerald-500/20 hover:bg-emerald-500 hover:text-white hover:border-emerald-500 transition-all rounded-xl">
+                        <FileSpreadsheet class="w-4 h-4 mr-2" />
+                        Excel
+                    </Button>
                 </div>
             </div>
 
