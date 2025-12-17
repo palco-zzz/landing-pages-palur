@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { ref, watch, computed } from 'vue';
 import { Head, router } from '@inertiajs/vue3';
 import { route } from 'ziggy-js';
-import { Search, Printer, Calendar } from 'lucide-vue-next';
+import { Search, Printer, Calendar, ChevronDown } from 'lucide-vue-next';
 import { usePrinter, type ReceiptData } from '@/composables/usePrinter';
 import { useDebounceFn } from '@vueuse/core';
 
@@ -73,7 +73,8 @@ interface PaginatedData {
 const props = defineProps<{
     transactions: PaginatedData;
     filters: {
-        date: string;
+        start_date: string;
+        end_date: string;
         search: string;
     };
 }>();
@@ -81,11 +82,59 @@ const props = defineProps<{
 // Printer
 const { print } = usePrinter();
 
-// Filter state
-const dateFilter = ref(props.filters.date);
+// --- Helper Functions for Date Calculations ---
+const formatDate = (date: Date): string => {
+    return date.toISOString().split('T')[0];
+};
+
+const getToday = () => formatDate(new Date());
+
+const getYesterday = () => {
+    const d = new Date();
+    d.setDate(d.getDate() - 1);
+    return formatDate(d);
+};
+
+const getLast7Days = () => {
+    const d = new Date();
+    d.setDate(d.getDate() - 7);
+    return formatDate(d);
+};
+
+const getFirstDayOfMonth = () => {
+    const d = new Date();
+    return formatDate(new Date(d.getFullYear(), d.getMonth(), 1));
+};
+
+// --- Filter State ---
+const presetFilter = ref('hari_ini');
+const startDate = ref(props.filters.start_date);
+const endDate = ref(props.filters.end_date);
 const searchFilter = ref(props.filters.search);
 
-// Methods
+// Detect initial preset based on incoming filter values
+const detectInitialPreset = () => {
+    const today = getToday();
+    const yesterday = getYesterday();
+    const last7 = getLast7Days();
+    const firstOfMonth = getFirstDayOfMonth();
+
+    if (startDate.value === today && endDate.value === today) {
+        return 'hari_ini';
+    } else if (startDate.value === yesterday && endDate.value === yesterday) {
+        return 'kemarin';
+    } else if (startDate.value === last7 && endDate.value === today) {
+        return '7_hari';
+    } else if (startDate.value === firstOfMonth && endDate.value === today) {
+        return 'bulan_ini';
+    } else {
+        return 'custom';
+    }
+};
+
+presetFilter.value = detectInitialPreset();
+
+// --- Methods ---
 const formatPrice = (price: number): string => {
     return new Intl.NumberFormat('id-ID').format(price);
 };
@@ -115,7 +164,8 @@ const paymentMethodColors: Record<string, string> = {
 
 const applyFilters = () => {
     router.get(route('history.index'), {
-        date: dateFilter.value,
+        start_date: startDate.value,
+        end_date: endDate.value,
         search: searchFilter.value,
     }, {
         preserveState: true,
@@ -123,18 +173,51 @@ const applyFilters = () => {
     });
 };
 
-const debouncedSearch = useDebounceFn(() => {
+const debouncedApplyFilters = useDebounceFn(() => {
     applyFilters();
 }, 500);
 
-// Watch for date changes (immediate)
-watch(dateFilter, () => {
+// --- Watchers ---
+
+// Watch preset dropdown
+watch(presetFilter, (newPreset) => {
+    const today = getToday();
+
+    switch (newPreset) {
+        case 'hari_ini':
+            startDate.value = today;
+            endDate.value = today;
+            break;
+        case 'kemarin':
+            startDate.value = getYesterday();
+            endDate.value = getYesterday();
+            break;
+        case '7_hari':
+            startDate.value = getLast7Days();
+            endDate.value = today;
+            break;
+        case 'bulan_ini':
+            startDate.value = getFirstDayOfMonth();
+            endDate.value = today;
+            break;
+        case 'custom':
+            // Don't change dates, let user pick manually
+            return;
+    }
+    // Immediately apply for presets
     applyFilters();
 });
 
-// Watch for search changes (debounced)
+// Watch date inputs (for custom mode) with debounce
+watch([startDate, endDate], () => {
+    if (presetFilter.value === 'custom') {
+        debouncedApplyFilters();
+    }
+});
+
+// Watch search input with debounce
 watch(searchFilter, () => {
-    debouncedSearch();
+    debouncedApplyFilters();
 });
 
 // Reprint receipt
@@ -181,15 +264,66 @@ const goToPage = (url: string | null) => {
                 <p class="text-sm text-slate-500">Lihat dan cetak ulang transaksi yang sudah selesai</p>
             </div>
 
-            <!-- Filters -->
-            <div class="flex flex-col sm:flex-row gap-4 mb-6">
-                <div class="relative flex-1 sm:max-w-xs">
-                    <Calendar class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                    <Input v-model="dateFilter" type="date" class="pl-10" />
+            <!-- Smart Filter Bar -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6 p-4 bg-zinc-100 dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-700">
+                <!-- Preset Dropdown -->
+                <div class="relative">
+                    <label class="block text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1.5">Filter Cepat</label>
+                    <div class="relative">
+                        <select
+                            v-model="presetFilter"
+                            class="w-full h-10 pl-3 pr-10 bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-600 rounded-lg text-sm text-zinc-900 dark:text-zinc-100 appearance-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                        >
+                            <option value="hari_ini">Hari Ini</option>
+                            <option value="kemarin">Kemarin</option>
+                            <option value="7_hari">7 Hari Terakhir</option>
+                            <option value="bulan_ini">Bulan Ini</option>
+                            <option value="custom">Custom</option>
+                        </select>
+                        <ChevronDown class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 pointer-events-none" />
+                    </div>
                 </div>
-                <div class="relative flex-1 sm:max-w-sm">
-                    <Search class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                    <Input v-model="searchFilter" type="text" placeholder="Cari nama pelanggan..." class="pl-10" />
+
+                <!-- Start Date -->
+                <div class="relative">
+                    <label class="block text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1.5">Dari Tanggal</label>
+                    <div class="relative">
+                        <Calendar class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+                        <input
+                            v-model="startDate"
+                            type="date"
+                            :disabled="presetFilter !== 'custom'"
+                            class="w-full h-10 pl-10 pr-3 bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-600 rounded-lg text-sm text-zinc-900 dark:text-zinc-100 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                        />
+                    </div>
+                </div>
+
+                <!-- End Date -->
+                <div class="relative">
+                    <label class="block text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1.5">Sampai Tanggal</label>
+                    <div class="relative">
+                        <Calendar class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+                        <input
+                            v-model="endDate"
+                            type="date"
+                            :disabled="presetFilter !== 'custom'"
+                            class="w-full h-10 pl-10 pr-3 bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-600 rounded-lg text-sm text-zinc-900 dark:text-zinc-100 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                        />
+                    </div>
+                </div>
+
+                <!-- Search Input -->
+                <div class="relative">
+                    <label class="block text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1.5">Cari Pelanggan</label>
+                    <div class="relative">
+                        <Search class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+                        <input
+                            v-model="searchFilter"
+                            type="text"
+                            placeholder="Nama pelanggan..."
+                            class="w-full h-10 pl-10 pr-3 bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-600 rounded-lg text-sm text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                        />
+                    </div>
                 </div>
             </div>
 
@@ -212,7 +346,7 @@ const goToPage = (url: string | null) => {
                         <TableBody>
                             <TableRow v-if="transactions.data.length === 0">
                                 <TableCell colspan="7" class="text-center py-12">
-                                    <p class="text-slate-500">Tidak ada transaksi pada tanggal ini</p>
+                                    <p class="text-slate-500">Tidak ada transaksi pada rentang tanggal ini</p>
                                 </TableCell>
                             </TableRow>
                             <TableRow v-for="tx in transactions.data" :key="tx.id">

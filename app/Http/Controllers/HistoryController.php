@@ -14,12 +14,15 @@ class HistoryController extends Controller
      */
     public function index(Request $request): Response
     {
-        $date = $request->input('date', now()->format('Y-m-d'));
+        $today = now()->format('Y-m-d');
+        $startDate = $request->input('start_date', $today);
+        $endDate = $request->input('end_date', $today);
         $search = $request->input('search', '');
 
         $transactions = Transaction::with(['items.menu', 'user'])
             ->where('status', 'paid')
-            ->whereDate('created_at', $date)
+            ->whereDate('created_at', '>=', $startDate)
+            ->whereDate('created_at', '<=', $endDate)
             ->when($search, function ($query, $search) {
                 $query->where('customer_name', 'like', "%{$search}%");
             })
@@ -30,7 +33,8 @@ class HistoryController extends Controller
         return Inertia::render('History/Index', [
             'transactions' => $transactions,
             'filters' => [
-                'date' => $date,
+                'start_date' => $startDate,
+                'end_date' => $endDate,
                 'search' => $search,
             ],
         ]);
