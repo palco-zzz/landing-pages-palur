@@ -32,6 +32,7 @@ Route::middleware(['auth', 'verified'])->prefix('pos')->name('pos.')->group(func
     Route::post('/orders/{transaction}/pay', [PosController::class, 'pay'])->name('orders.pay');
     Route::post('/orders/{transaction}/cancel', [PosController::class, 'cancel'])->name('orders.cancel');
     Route::delete('/item/{item}', [PosController::class, 'voidItem'])->name('void');
+    Route::post('/items/batch-void', [PosController::class, 'batchVoid'])->name('items.batch-void');
 });
 
 // Transaction History (All authenticated users)

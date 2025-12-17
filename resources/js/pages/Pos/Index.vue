@@ -2,7 +2,8 @@
 import { ref, computed } from 'vue';
 import { Head, router } from '@inertiajs/vue3';
 import { route } from 'ziggy-js';
-import { Search, Plus, Minus, Trash2, ShoppingCart, UtensilsCrossed, Clock, User, CreditCard, ListOrdered } from 'lucide-vue-next';
+import { Search, Plus, Minus, Trash2, ShoppingCart, UtensilsCrossed, Clock, User, CreditCard, ListOrdered, X, RotateCcw } from 'lucide-vue-next';
+import { toast } from 'vue-sonner';
 
 // Layout & Components
 import AppLayout from '@/layouts/AppLayout.vue';
@@ -90,6 +91,8 @@ const customerName = ref('');
 const isProcessing = ref(false);
 const selectedTransaction = ref<Transaction | null>(null);
 const isCheckoutOpen = ref(false);
+const isVoiding = ref(false);
+const itemsToDelete = ref<number[]>([]); // Staged deletion IDs
 
 // Dynamic categories with "All" option
 const categoryTabs = computed(() => [
@@ -192,6 +195,7 @@ const clearCart = () => {
     cart.value = [];
     customerName.value = '';
     selectedTransaction.value = null;
+    itemsToDelete.value = [];
 };
 
 const clearNewItems = () => {
@@ -202,6 +206,7 @@ const clearNewItems = () => {
 const selectOrder = (transaction: Transaction) => {
     selectedTransaction.value = transaction;
     customerName.value = transaction.customer_name;
+    itemsToDelete.value = []; // Clear any previous deletion marks
 
     // Load existing items into cart (only active items)
     cart.value = transaction.items
@@ -213,26 +218,82 @@ const selectOrder = (transaction: Transaction) => {
             itemId: item.id,
         }));
 
-    // Switch to menu view (don't auto-open sheet)
+    // Switch to menu view and open cart immediately for managing
     currentView.value = 'menu';
+    isCartOpen.value = true;
 };
 
-// Void an existing item
-const voidItem = (item: CartItem) => {
+// Toggle delete mark for staged deletion
+const toggleDeleteMark = (item: CartItem) => {
     if (!item.itemId) return;
 
-    if (confirm('Batalkan item ini? Dapur akan diberitahu.')) {
-        router.delete(route('pos.void', { item: item.itemId }), {
-            onSuccess: () => {
-                // Remove item from cart
-                cart.value = cart.value.filter(i => i.itemId !== item.itemId);
-            },
-            onError: (errors) => {
-                console.error('Void failed:', errors);
-                alert('Gagal membatalkan item.');
-            },
-        });
+    const index = itemsToDelete.value.indexOf(item.itemId);
+    if (index > -1) {
+        // Already marked, unmark it (undo)
+        itemsToDelete.value.splice(index, 1);
+    } else {
+        // Mark for deletion
+        itemsToDelete.value.push(item.itemId);
     }
+};
+
+// Check if an item is marked for deletion
+const isMarkedForDeletion = (itemId: number | undefined): boolean => {
+    if (!itemId) return false;
+    return itemsToDelete.value.includes(itemId);
+};
+
+// Commit all staged deletions (batch void)
+const commitDeletions = () => {
+    if (itemsToDelete.value.length === 0) return;
+
+    if (!confirm(`Batalkan ${itemsToDelete.value.length} item? Struk void akan dicetak.`)) {
+        return;
+    }
+
+    isVoiding.value = true;
+
+    router.post(route('pos.items.batch-void'), {
+        item_ids: itemsToDelete.value,
+    }, {
+        preserveScroll: true,
+        preserveState: false, // Refresh to get updated data
+        onSuccess: () => {
+            const count = itemsToDelete.value.length;
+
+            // Remove voided items from local cart
+            cart.value = cart.value.filter(i => !i.itemId || !itemsToDelete.value.includes(i.itemId));
+            itemsToDelete.value = [];
+
+            toast.success(`${count} Item Dibatalkan`, {
+                description: 'Struk void telah dicetak.',
+            });
+
+            // If all existing items are voided, close and clear
+            if (existingItemsOnly.value.length === 0 && newItemsOnly.value.length === 0) {
+                isCartOpen.value = false;
+                clearCart();
+            }
+        },
+        onError: (errors) => {
+            console.error('Batch void failed:', errors);
+            toast.error('Gagal Membatalkan', {
+                description: 'Terjadi kesalahan saat membatalkan item.',
+            });
+        },
+        onFinish: () => {
+            isVoiding.value = false;
+        },
+    });
+};
+
+// Add more items - closes modal, keeps transaction context
+const addMoreItems = () => {
+    isCartOpen.value = false;
+    // selectedTransaction and cart remain active, so user can add more
+    toast.info('Tambah Menu', {
+        description: `Pilih menu untuk ditambahkan ke pesanan ${customerName.value}.`,
+    });
 };
 
 const processOrder = () => {
@@ -295,6 +356,7 @@ const addItemsToOrder = () => {
         onSuccess: () => {
             clearCart();
             isCartOpen.value = false;
+            toast.success('Berhasil', { description: 'Item baru telah ditambahkan ke pesanan.' });
         },
         onError: (errors) => {
             console.error('Add items failed:', errors);
@@ -320,6 +382,11 @@ const onCheckoutSuccess = () => {
 const getCartQuantity = (menuId: number): number => {
     const item = cart.value.find(item => item.menu.id === menuId && !item.isExisting);
     return item?.quantity || 0;
+};
+
+// Close modal (just closes, changes already saved)
+const closeOrderSheet = () => {
+    isCartOpen.value = false;
 };
 </script>
 
@@ -521,7 +588,7 @@ const getCartQuantity = (menuId: number): number => {
                 </div>
             </div>
 
-            <!-- Cart Sheet -->
+            <!-- Cart Sheet (Order Management Modal) -->
             <Sheet v-model:open="isCartOpen">
                 <SheetContent side="bottom" class="h-[85vh] flex flex-col rounded-t-3xl">
                     <SheetHeader class="border-b border-slate-200 dark:border-slate-700 pb-4">
@@ -534,11 +601,10 @@ const getCartQuantity = (menuId: number): number => {
                                     {{ newItemsOnly.length }} item baru ditambahkan
                                 </p>
                             </div>
-                            <Button v-if="hasNewItems" variant="ghost" size="sm"
-                                class="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950"
-                                @click="isEditingOrder ? clearNewItems() : clearCart()">
-                                <Trash2 class="w-4 h-4 mr-1" />
-                                {{ isEditingOrder ? 'Hapus Tambahan' : 'Hapus Semua' }}
+                            <!-- Close Button - Just closes, changes are saved -->
+                            <Button variant="ghost" size="icon" class="rounded-full" @click="closeOrderSheet">
+                                <X class="w-5 h-5" />
+                                <span class="sr-only">Tutup</span>
                             </Button>
                         </div>
                     </SheetHeader>
@@ -555,14 +621,18 @@ const getCartQuantity = (menuId: number): number => {
                             <p class="text-sm text-slate-500">Tambahkan menu untuk memulai pesanan</p>
                         </div>
 
-                        <!-- Existing Items (locked) -->
+                        <!-- Existing Items (with staged deletion) -->
                         <template v-if="existingItemsOnly.length > 0">
                             <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider px-1 mb-2">
-                                Item Sebelumnya
+                                Item Pesanan
                             </div>
                             <div v-for="(item, index) in cart" :key="`existing-${item.menu.id}`"
-                                v-show="item.isExisting"
-                                class="flex items-center gap-3 p-3 bg-slate-100 dark:bg-slate-700 rounded-xl">
+                                v-show="item.isExisting" :class="[
+                                    'flex items-center gap-3 p-3 rounded-xl transition-all',
+                                    isMarkedForDeletion(item.itemId)
+                                        ? 'bg-red-100 dark:bg-red-950 opacity-60'
+                                        : 'bg-slate-100 dark:bg-slate-700'
+                                ]">
                                 <div
                                     class="w-12 h-12 rounded-lg bg-slate-200 dark:bg-slate-600 overflow-hidden flex-shrink-0">
                                     <img v-if="item.menu.image" :src="item.menu.image" :alt="item.menu.name"
@@ -572,21 +642,36 @@ const getCartQuantity = (menuId: number): number => {
                                     </div>
                                 </div>
                                 <div class="flex-1 min-w-0">
-                                    <h4 class="font-medium text-sm text-slate-600 dark:text-slate-300 truncate">
+                                    <h4 :class="[
+                                        'font-medium text-sm truncate',
+                                        isMarkedForDeletion(item.itemId)
+                                            ? 'line-through text-red-500'
+                                            : 'text-slate-600 dark:text-slate-300'
+                                    ]">
                                         {{ item.menu.name }}
                                     </h4>
-                                    <p class="text-sm text-slate-500">
+                                    <p :class="[
+                                        'text-sm',
+                                        isMarkedForDeletion(item.itemId) ? 'line-through text-red-400' : 'text-slate-500'
+                                    ]">
                                         {{ item.quantity }}x @ Rp {{ formatPrice(item.menu.price) }}
                                     </p>
                                 </div>
-                                <div class="text-sm font-medium text-slate-500">
+                                <div :class="[
+                                    'text-sm font-medium',
+                                    isMarkedForDeletion(item.itemId) ? 'line-through text-red-400' : 'text-slate-500'
+                                ]">
                                     Rp {{ formatPrice(item.menu.price * item.quantity) }}
                                 </div>
-                                <!-- Void Button -->
-                                <Button v-if="item.itemId" variant="ghost" size="icon-sm"
-                                    class="text-red-500 hover:text-red-600 hover:bg-red-100 dark:hover:bg-red-950 rounded-full"
-                                    @click="voidItem(item)">
-                                    <Trash2 class="w-4 h-4" />
+                                <!-- Toggle Delete Mark Button -->
+                                <Button v-if="item.itemId" variant="ghost" size="icon-sm" :class="[
+                                    'rounded-full',
+                                    isMarkedForDeletion(item.itemId)
+                                        ? 'text-green-600 hover:text-green-700 hover:bg-green-100 dark:hover:bg-green-950'
+                                        : 'text-red-500 hover:text-red-600 hover:bg-red-100 dark:hover:bg-red-950'
+                                ]" :disabled="isVoiding" @click="toggleDeleteMark(item)">
+                                    <RotateCcw v-if="isMarkedForDeletion(item.itemId)" class="w-4 h-4" />
+                                    <Trash2 v-else class="w-4 h-4" />
                                 </Button>
                             </div>
                         </template>
@@ -686,24 +771,44 @@ const getCartQuantity = (menuId: number): number => {
                         <!-- Editing Order -->
                         <template v-else>
                             <div class="w-full space-y-2">
+                                <!-- Commit Deletions Button (staged) -->
+                                <Button v-if="itemsToDelete.length > 0"
+                                    class="w-full h-12 font-bold bg-red-600 hover:bg-red-700 text-white rounded-xl"
+                                    :disabled="isVoiding" @click="commitDeletions">
+                                    <Trash2 class="w-5 h-5 mr-2" />
+                                    Batalkan {{ itemsToDelete.length }} Item
+                                </Button>
+
+                                <!-- Add More Items Button -->
+                                <Button
+                                    class="w-full h-12 font-bold bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl"
+                                    :disabled="itemsToDelete.length > 0" @click="addMoreItems">
+                                    <Plus class="w-5 h-5 mr-2" />
+                                    Tambah Menu
+                                </Button>
+
                                 <!-- Save Add-ons (only if there are new items) -->
                                 <Button v-if="hasNewItems"
                                     class="w-full h-12 font-bold bg-orange-500 hover:bg-orange-600 text-white rounded-xl"
-                                    :disabled="isProcessing" @click="addItemsToOrder">
-                                    <Plus class="w-5 h-5 mr-2" />
+                                    :disabled="isProcessing || itemsToDelete.length > 0" @click="addItemsToOrder">
+                                    <ShoppingCart class="w-5 h-5 mr-2" />
                                     Simpan Tambahan
                                 </Button>
 
                                 <!-- Checkout Button (always visible when editing) -->
                                 <Button
                                     class="w-full h-12 font-bold bg-green-600 hover:bg-green-700 text-white rounded-xl"
-                                    :disabled="isProcessing || hasNewItems" @click="openCheckout">
+                                    :disabled="isProcessing || hasNewItems || itemsToDelete.length > 0"
+                                    @click="openCheckout">
                                     <CreditCard class="w-5 h-5 mr-2" />
                                     Bayar / Checkout
                                 </Button>
 
                                 <p v-if="hasNewItems" class="text-xs text-center text-slate-500">
                                     Simpan tambahan terlebih dahulu sebelum bayar
+                                </p>
+                                <p v-else-if="itemsToDelete.length > 0" class="text-xs text-center text-red-500">
+                                    Konfirmasi pembatalan item terlebih dahulu
                                 </p>
                             </div>
                         </template>

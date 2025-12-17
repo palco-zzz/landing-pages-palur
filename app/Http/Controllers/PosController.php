@@ -353,4 +353,86 @@ class PosController extends Controller
             ->with('success', "Item {$item->menu->name} berhasil dibatalkan!")
             ->with('print_job', $printJob);
     }
+
+    /**
+     * Batch void/cancel multiple items from an order (staged deletion).
+     */
+    public function batchVoid(Request $request)
+    {
+        $request->validate([
+            'item_ids' => 'required|array|min:1',
+            'item_ids.*' => 'required|integer|exists:transaction_items,id',
+        ]);
+
+        // Get all items
+        $items = TransactionItem::with(['transaction', 'menu'])
+            ->whereIn('id', $request->item_ids)
+            ->get();
+
+        if ($items->isEmpty()) {
+            return redirect()->back()->with('error', 'Item tidak ditemukan.');
+        }
+
+        // Verify all items belong to the same transaction
+        $transactionIds = $items->pluck('transaction_id')->unique();
+        if ($transactionIds->count() > 1) {
+            return redirect()->back()->with('error', 'Semua item harus dari transaksi yang sama.');
+        }
+
+        $transaction = $items->first()->transaction;
+
+        // Can only void unpaid transactions
+        if ($transaction->status !== 'unpaid') {
+            return redirect()->back()->with('error', 'Tidak dapat membatalkan item pada transaksi yang sudah dibayar.');
+        }
+
+        // Verify all items are still active
+        $inactiveItems = $items->where('status', '!=', 'active');
+        if ($inactiveItems->isNotEmpty()) {
+            return redirect()->back()->with('error', 'Beberapa item sudah dibatalkan sebelumnya.');
+        }
+
+        try {
+            DB::beginTransaction();
+
+            // Update all items to void
+            TransactionItem::whereIn('id', $request->item_ids)
+                ->update(['status' => 'void']);
+
+            // Recalculate transaction total (only active items)
+            $newTotal = $transaction->items()
+                ->where('status', 'active')
+                ->sum('subtotal');
+            $transaction->update(['total_amount' => $newTotal]);
+
+            DB::commit();
+
+            // Create single void ticket for kitchen with all voided items
+            $printJob = [
+                'type' => 'void',
+                'title' => 'VOID / BATAL',
+                'store_name' => 'Bakmi Jowo Palur',
+                'date' => now()->format('d/m/Y H:i'),
+                'cashier' => auth()->user()->name ?? 'Kasir',
+                'customer_name' => $transaction->customer_name,
+                'order_number' => $transaction->uuid ? substr($transaction->uuid, 0, 8) : $transaction->id,
+                'items' => $items->map(function ($item) {
+                    return [
+                        'name' => $item->menu->name ?? 'Item',
+                        'qty' => $item->quantity,
+                        'status' => 'DIBATALKAN',
+                    ];
+                })->toArray(),
+            ];
+
+            $count = count($request->item_ids);
+            return redirect()->back()
+                ->with('success', "{$count} item berhasil dibatalkan!")
+                ->with('print_job', $printJob);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Gagal membatalkan item: ' . $e->getMessage());
+        }
+    }
 }
