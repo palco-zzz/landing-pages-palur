@@ -592,20 +592,13 @@ const closeOrderSheet = () => {
             <Sheet v-model:open="isCartOpen">
                 <SheetContent side="bottom" class="h-[85vh] flex flex-col rounded-t-3xl">
                     <SheetHeader class="border-b border-slate-200 dark:border-slate-700 pb-4">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <SheetTitle class="text-xl font-bold">
-                                    {{ isEditingOrder ? `Pesanan: ${customerName}` : 'Pesanan Baru' }}
-                                </SheetTitle>
-                                <p v-if="isEditingOrder && hasNewItems" class="text-sm text-orange-600 mt-1">
-                                    {{ newItemsOnly.length }} item baru ditambahkan
-                                </p>
-                            </div>
-                            <!-- Close Button - Just closes, changes are saved -->
-                            <Button variant="ghost" size="icon" class="rounded-full" @click="closeOrderSheet">
-                                <X class="w-5 h-5" />
-                                <span class="sr-only">Tutup</span>
-                            </Button>
+                        <div>
+                            <SheetTitle class="text-xl font-bold">
+                                {{ isEditingOrder ? `Pesanan: ${customerName}` : 'Pesanan Baru' }}
+                            </SheetTitle>
+                            <p v-if="isEditingOrder && hasNewItems" class="text-sm text-orange-600 mt-1">
+                                {{ newItemsOnly.length }} item baru ditambahkan
+                            </p>
                         </div>
                     </SheetHeader>
 
