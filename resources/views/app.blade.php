@@ -6,7 +6,7 @@
 
         {{-- PWA Meta Tags --}}
         <meta name="theme-color" content="#09090b">
-        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
         {{-- Inline script to detect system dark mode preference and apply it immediately --}}

@@ -175,18 +175,18 @@ const deleteMenu = () => {
             <!-- Header -->
             <div class="flex items-center justify-between mb-6">
                 <div>
-                    <h1 class="text-2xl font-bold text-slate-900 dark:text-white">Daftar Menu</h1>
-                    <p class="text-sm text-slate-500">Kelola menu makanan dan minuman</p>
+                    <h1 class="text-2xl font-bold text-foreground">Daftar Menu</h1>
+                    <p class="text-sm text-muted-foreground">Kelola menu makanan dan minuman</p>
                 </div>
-                <Button class="bg-orange-500 hover:bg-orange-600" @click="openCreateDialog">
+                <Button class="bg-primary text-primary-foreground hover:bg-primary/90 shadow-md"
+                    @click="openCreateDialog">
                     <Plus class="w-4 h-4 mr-2" />
                     Tambah Menu
                 </Button>
             </div>
 
             <!-- Table -->
-            <div
-                class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+            <div class="bg-card rounded-xl border border-border overflow-hidden shadow-sm">
                 <div class="overflow-x-auto">
                     <Table>
                         <TableHeader>
@@ -202,8 +202,8 @@ const deleteMenu = () => {
                             <TableRow v-if="menus.length === 0">
                                 <TableCell colspan="5" class="text-center py-12">
                                     <div class="flex flex-col items-center gap-2">
-                                        <UtensilsCrossed class="w-12 h-12 text-slate-300" />
-                                        <p class="text-slate-500">Belum ada menu</p>
+                                        <UtensilsCrossed class="w-12 h-12 text-muted-foreground/20" />
+                                        <p class="text-muted-foreground">Belum ada menu</p>
                                     </div>
                                 </TableCell>
                             </TableRow>
@@ -211,14 +211,14 @@ const deleteMenu = () => {
                                 <TableCell>
                                     <Avatar class="w-12 h-12 rounded-lg">
                                         <AvatarImage v-if="menu.image" :src="menu.image" :alt="menu.name" />
-                                        <AvatarFallback class="rounded-lg bg-slate-100 dark:bg-slate-800">
-                                            <UtensilsCrossed class="w-5 h-5 text-slate-400" />
+                                        <AvatarFallback class="rounded-lg bg-muted">
+                                            <UtensilsCrossed class="w-5 h-5 text-muted-foreground" />
                                         </AvatarFallback>
                                     </Avatar>
                                 </TableCell>
-                                <TableCell class="font-medium">{{ menu.name }}</TableCell>
+                                <TableCell class="font-medium text-foreground">{{ menu.name }}</TableCell>
                                 <TableCell>
-                                    <Badge variant="outline" class="bg-orange-100 text-orange-800 border-orange-300">
+                                    <Badge variant="outline" class="bg-primary/10 text-primary border-primary/20">
                                         {{ menu.category?.name || 'Tidak ada' }}
                                     </Badge>
                                 </TableCell>
@@ -237,7 +237,9 @@ const deleteMenu = () => {
                                                 <Pencil class="w-4 h-4 mr-2" />
                                                 Edit
                                             </DropdownMenuItem>
-                                            <DropdownMenuItem class="text-red-600" @click="confirmDelete(menu.id)">
+                                            <DropdownMenuItem
+                                                class="text-destructive focus:text-destructive focus:bg-destructive/10"
+                                                @click="confirmDelete(menu.id)">
                                                 <Trash2 class="w-4 h-4 mr-2" />
                                                 Hapus
                                             </DropdownMenuItem>
@@ -295,15 +297,15 @@ const deleteMenu = () => {
                         <Label>Gambar</Label>
                         <div class="flex items-center gap-4">
                             <div
-                                class="w-20 h-20 rounded-lg border-2 border-dashed border-slate-300 flex items-center justify-center overflow-hidden">
+                                class="w-20 h-20 rounded-lg border-2 border-dashed border-input flex items-center justify-center overflow-hidden bg-muted/30">
                                 <img v-if="imagePreview" :src="imagePreview" alt="Preview"
                                     class="w-full h-full object-cover" />
-                                <ImageIcon v-else class="w-8 h-8 text-slate-400" />
+                                <ImageIcon v-else class="w-8 h-8 text-muted-foreground" />
                             </div>
                             <div class="flex-1">
                                 <Input type="file" accept="image/jpeg,image/png,image/jpg,image/webp"
                                     @change="handleImageChange" />
-                                <p class="text-xs text-slate-500 mt-1">JPG, PNG, atau WebP. Maks 2MB.</p>
+                                <p class="text-xs text-muted-foreground mt-1">JPG, PNG, atau WebP. Maks 2MB.</p>
                             </div>
                         </div>
                     </div>
@@ -312,7 +314,8 @@ const deleteMenu = () => {
                         <Button type="button" variant="outline" @click="isDialogOpen = false">
                             Batal
                         </Button>
-                        <Button type="submit" class="bg-orange-500 hover:bg-orange-600" :disabled="form.processing">
+                        <Button type="submit" class="bg-primary text-primary-foreground hover:bg-primary/90"
+                            :disabled="form.processing">
                             {{ editingMenu ? 'Simpan Perubahan' : 'Tambah Menu' }}
                         </Button>
                     </DialogFooter>
@@ -329,7 +332,7 @@ const deleteMenu = () => {
                         Konfirmasi penghapusan menu.
                     </DialogDescription>
                 </DialogHeader>
-                <p class="text-sm text-slate-600 dark:text-slate-400">
+                <p class="text-sm text-muted-foreground">
                     Apakah Anda yakin ingin menghapus menu ini? Tindakan ini tidak dapat dibatalkan.
                 </p>
                 <DialogFooter class="gap-2">

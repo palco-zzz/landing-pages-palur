@@ -6,27 +6,24 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { urlIsActive } from '@/lib/utils';
 import { type NavItem } from '@/types';
-import { Link, usePage } from '@inertiajs/vue3';
+import { Link } from '@inertiajs/vue3';
 
 defineProps<{
     items: NavItem[];
 }>();
-
-const page = usePage();
 </script>
 
 <template>
     <SidebarGroup class="px-2 py-0">
-        <SidebarGroupLabel>Platform</SidebarGroupLabel>
         <SidebarMenu>
             <SidebarMenuItem v-for="item in items" :key="item.title">
-                <SidebarMenuButton
-                    as-child
-                    :is-active="urlIsActive(item.href, page.url)"
-                    :tooltip="item.title"
-                >
+                <SidebarMenuButton as-child :is-active="item.isActive" :tooltip="item.title"
+                    class="transition-all duration-200 border-l-4 border-transparent" :class="[
+                        item.isActive
+                            ? 'border-primary bg-accent text-primary font-medium'
+                            : 'text-muted-foreground hover:text-foreground hover:bg-accent/50'
+                    ]">
                     <Link :href="item.href">
                         <component :is="item.icon" />
                         <span>{{ item.title }}</span>

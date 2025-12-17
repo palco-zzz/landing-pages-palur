@@ -25,47 +25,54 @@ const user = computed(() => (page.props.auth as { user: { role?: string } })?.us
 const isAdmin = computed(() => user.value?.role === 'admin');
 
 // Operational items (visible to all)
-const operationalItems: NavItem[] = [
+const operationalItems = computed<NavItem[]>(() => [
     {
         title: 'Dashboard',
         href: route('dashboard'),
         icon: LayoutGrid,
+        isActive: route().current('dashboard'),
     },
     {
         title: 'POS System',
         href: route('pos.index'),
         icon: Store,
+        isActive: route().current('pos.*'),
     },
     {
         title: 'Riwayat Transaksi',
         href: route('history.index'),
         icon: History,
+        isActive: route().current('history.*'),
     },
-];
+]);
 
 // Management items (admin only)
-const managementItems: NavItem[] = [
+const managementItems = computed<NavItem[]>(() => [
     {
         title: 'Daftar Menu',
         href: route('menus.index'),
         icon: Utensils,
+        isActive: route().current('menus.*'),
     },
     {
         title: 'Kategori',
         href: route('categories.index'),
         icon: Tags,
+        isActive: route().current('categories.*'),
     },
     {
         title: 'Pegawai',
         href: route('users.index'),
         icon: Users,
+        isActive: route().current('users.*'),
     },
     {
         title: 'Laporan',
         href: route('reports.index'),
         icon: BarChart3,
+        isActive: route().current('reports.*'),
     },
-];
+]);
 </script>
 
 <template>

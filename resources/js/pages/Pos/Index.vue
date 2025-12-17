@@ -395,22 +395,25 @@ const closeOrderSheet = () => {
     <Head title="POS System" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
-        <div class="h-[calc(100vh-4rem)] flex flex-col bg-slate-100 dark:bg-slate-950 relative">
+        <div class="h-[calc(100vh-4rem)] flex flex-col bg-muted/30 relative">
 
             <!-- Tab Switcher -->
-            <div
-                class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 py-2 flex-shrink-0">
+            <div class="bg-background border-b border-border px-4 py-2 flex-shrink-0">
                 <div class="flex gap-2">
-                    <Button :variant="currentView === 'menu' ? 'default' : 'outline'" size="sm" class="flex-1"
+                    <Button :variant="currentView === 'menu' ? 'default' : 'outline'" size="sm"
+                        class="flex-1 transition-all duration-300"
+                        :class="currentView === 'menu' ? 'bg-primary text-primary-foreground hover:bg-primary/90 border-0' : 'hover:bg-accent hover:text-accent-foreground'"
                         @click="currentView = 'menu'">
                         <UtensilsCrossed class="w-4 h-4 mr-2" />
                         Menu
                     </Button>
                     <Button :variant="currentView === 'active' ? 'default' : 'outline'" size="sm"
-                        class="flex-1 relative" @click="currentView = 'active'">
+                        class="flex-1 relative transition-all duration-300"
+                        :class="currentView === 'active' ? 'bg-primary text-primary-foreground hover:bg-primary/90 border-0' : 'hover:bg-accent hover:text-accent-foreground'"
+                        @click="currentView = 'active'">
                         <ListOrdered class="w-4 h-4 mr-2" />
                         Pesanan Aktif
-                        <Badge v-if="activeOrders.length > 0" class="ml-2 bg-orange-500 text-white">
+                        <Badge v-if="activeOrders.length > 0" class="ml-2 bg-background/20 text-primary-foreground">
                             {{ activeOrders.length }}
                         </Badge>
                     </Button>
@@ -418,7 +421,7 @@ const closeOrderSheet = () => {
 
                 <!-- Editing Order Indicator -->
                 <div v-if="isEditingOrder"
-                    class="mt-2 px-3 py-2 bg-orange-100 dark:bg-orange-950 rounded-lg flex items-center justify-between">
+                    class="mt-2 px-3 py-2 bg-orange-100 dark:bg-orange-950/30 border border-orange-500/20 rounded-lg flex items-center justify-between">
                     <div class="flex items-center gap-2">
                         <User class="w-4 h-4 text-orange-600" />
                         <span class="text-sm font-medium text-orange-700 dark:text-orange-300">
@@ -435,13 +438,12 @@ const closeOrderSheet = () => {
             <!-- Menu View -->
             <template v-if="currentView === 'menu'">
                 <!-- Search & Categories -->
-                <header
-                    class="sticky top-0 z-30 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm flex-shrink-0">
+                <header class="sticky top-0 z-30 bg-background border-b border-border shadow-sm flex-shrink-0">
                     <div class="px-4 py-3">
                         <div class="relative">
-                            <Search class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                            <Search class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                             <Input v-model="searchQuery" type="text" placeholder="Cari menu..."
-                                class="pl-10 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700" />
+                                class="pl-10 bg-muted/50 border-input focus:ring-primary" />
                         </div>
                     </div>
 
@@ -449,7 +451,9 @@ const closeOrderSheet = () => {
                         <div class="flex gap-2 min-w-max">
                             <Button v-for="cat in categoryTabs" :key="cat.key"
                                 :variant="activeCategory === cat.key ? 'default' : 'outline'" size="sm"
-                                class="rounded-full whitespace-nowrap" @click="activeCategory = cat.key">
+                                class="rounded-full whitespace-nowrap transition-all"
+                                :class="activeCategory === cat.key ? 'bg-primary text-primary-foreground hover:bg-primary/90' : 'hover:bg-accent hover:text-accent-foreground'"
+                                @click="activeCategory = cat.key">
                                 {{ cat.label }}
                             </Button>
                         </div>
@@ -461,40 +465,41 @@ const closeOrderSheet = () => {
                     <div v-if="filteredMenus.length === 0"
                         class="flex flex-col items-center justify-center py-16 text-center">
                         <div
-                            class="w-16 h-16 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center mb-4">
+                            class="w-16 h-16 rounded-full bg-slate-200 dark:bg-zinc-800 flex items-center justify-center mb-4">
                             <Search class="w-8 h-8 text-slate-400" />
                         </div>
-                        <h3 class="font-medium text-slate-600 dark:text-slate-300 mb-1">Menu tidak ditemukan</h3>
+                        <h3 class="font-medium text-slate-600 dark:text-zinc-300 mb-1">Menu tidak ditemukan</h3>
                         <p class="text-sm text-slate-500">Coba ubah kata kunci pencarian</p>
                     </div>
 
                     <div v-else class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                         <Card v-for="menu in filteredMenus" :key="menu.id"
-                            class="overflow-hidden border-slate-200 dark:border-slate-800 hover:shadow-md transition-shadow">
-                            <div class="aspect-video bg-slate-200 dark:bg-slate-800 relative overflow-hidden">
+                            class="overflow-hidden bg-card border border-border shadow-sm rounded-lg group hover:border-primary/50 transition-colors duration-300">
+                            <div class="aspect-video bg-muted relative overflow-hidden">
                                 <img v-if="menu.image" :src="menu.image" :alt="menu.name"
-                                    class="w-full h-full object-cover" />
+                                    class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
                                 <div v-else class="w-full h-full flex items-center justify-center">
-                                    <UtensilsCrossed class="w-8 h-8 text-slate-400" />
+                                    <UtensilsCrossed class="w-8 h-8 text-muted-foreground/50" />
                                 </div>
 
                                 <div v-if="getCartQuantity(menu.id) > 0"
-                                    class="absolute top-2 right-2 w-6 h-6 rounded-full bg-orange-500 text-white text-xs font-bold flex items-center justify-center shadow-lg">
+                                    class="absolute top-2 right-2 w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center shadow-lg animate-in zoom-in">
                                     {{ getCartQuantity(menu.id) }}
                                 </div>
                             </div>
 
                             <CardContent class="p-3">
-                                <h3 class="font-medium text-sm text-slate-900 dark:text-white line-clamp-2 mb-1">
+                                <h3 class="font-medium text-foreground line-clamp-2 mb-1">
                                     {{ menu.name }}
                                 </h3>
-                                <p class="text-sm font-semibold text-orange-600 dark:text-orange-400">
+                                <p class="text-lg font-bold text-primary">
                                     Rp {{ formatPrice(menu.price) }}
                                 </p>
                             </CardContent>
 
                             <CardFooter class="p-3 pt-0">
-                                <Button size="sm" class="w-full bg-orange-500 hover:bg-orange-600 text-white"
+                                <Button size="sm"
+                                    class="w-full bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground transition-colors border-0"
                                     @click="addToCart(menu)">
                                     <Plus class="w-4 h-4 mr-1" />
                                     Tambah
@@ -511,49 +516,51 @@ const closeOrderSheet = () => {
                     <div v-if="activeOrders.length === 0"
                         class="flex flex-col items-center justify-center py-16 text-center">
                         <div
-                            class="w-16 h-16 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center mb-4">
+                            class="w-16 h-16 rounded-full bg-slate-200 dark:bg-zinc-800 flex items-center justify-center mb-4">
                             <ListOrdered class="w-8 h-8 text-slate-400" />
                         </div>
-                        <h3 class="font-medium text-slate-600 dark:text-slate-300 mb-1">Tidak ada pesanan aktif</h3>
+                        <h3 class="font-medium text-slate-600 dark:text-zinc-300 mb-1">Tidak ada pesanan aktif</h3>
                         <p class="text-sm text-slate-500">Buat pesanan baru dari tab Menu</p>
                     </div>
 
                     <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         <Card v-for="order in activeOrders" :key="order.id"
-                            class="cursor-pointer hover:shadow-lg transition-shadow border-slate-200 dark:border-slate-800"
+                            class="cursor-pointer bg-card border-border hover:border-primary/50 transition-all duration-300 hover:shadow-md"
                             @click="selectOrder(order)">
                             <CardHeader class="pb-2">
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center gap-2">
-                                        <User class="w-5 h-5 text-slate-500" />
-                                        <span class="font-bold text-lg text-slate-900 dark:text-white">
+                                        <User class="w-5 h-5 text-muted-foreground" />
+                                        <span class="font-bold text-lg text-card-foreground">
                                             {{ order.customer_name }}
                                         </span>
                                     </div>
-                                    <Badge variant="outline" class="bg-yellow-100 text-yellow-800 border-yellow-300">
+                                    <Badge variant="outline"
+                                        class="bg-yellow-500/10 text-yellow-500 border-yellow-500/20">
                                         Belum Bayar
                                     </Badge>
                                 </div>
                             </CardHeader>
 
                             <CardContent class="space-y-3">
-                                <div class="text-sm text-slate-500 dark:text-slate-400">
+                                <div class="text-sm text-muted-foreground">
                                     {{ order.items.length }} item
                                 </div>
 
                                 <div class="flex items-center justify-between">
-                                    <div class="flex items-center gap-1 text-sm text-slate-500">
+                                    <div class="flex items-center gap-1 text-sm text-muted-foreground">
                                         <Clock class="w-4 h-4" />
                                         {{ formatTimeAgo(order.created_at) }}
                                     </div>
-                                    <div class="font-bold text-lg text-orange-600 dark:text-orange-400">
+                                    <div class="font-bold text-lg text-primary">
                                         Rp {{ formatPrice(order.total_amount) }}
                                     </div>
                                 </div>
                             </CardContent>
 
                             <CardFooter class="pt-0">
-                                <Button size="sm" variant="outline" class="w-full">
+                                <Button size="sm" variant="outline"
+                                    class="w-full hover:bg-primary/10 hover:text-primary hover:border-primary/50">
                                     <Plus class="w-4 h-4 mr-2" />
                                     Kelola Pesanan
                                 </Button>
@@ -565,15 +572,16 @@ const closeOrderSheet = () => {
 
             <!-- Floating Cart Summary Bar -->
             <div v-if="!isCartEmpty || isEditingOrder"
-                class="absolute bottom-0 left-0 right-0 z-40 bg-slate-900 dark:bg-slate-800 text-white px-4 py-3 shadow-2xl border-t border-slate-700">
+                class="fixed bottom-20 md:bottom-0 left-0 right-0 z-40 bg-card/95 backdrop-blur-lg text-card-foreground px-4 py-3 shadow-2xl border-t border-border">
                 <div class="flex items-center justify-between max-w-4xl mx-auto">
                     <div class="flex items-center gap-4">
                         <div class="flex items-center gap-2">
-                            <div class="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center">
+                            <div
+                                class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground">
                                 <ShoppingCart class="w-4 h-4" />
                             </div>
                             <div>
-                                <p class="text-xs text-slate-400">
+                                <p class="text-xs text-muted-foreground">
                                     {{ isEditingOrder ? customerName : `${cartItemsCount} item` }}
                                 </p>
                                 <p class="font-bold text-sm">Rp {{ formatPrice(cartTotal) }}</p>
@@ -581,7 +589,8 @@ const closeOrderSheet = () => {
                         </div>
                     </div>
 
-                    <Button class="bg-orange-500 hover:bg-orange-600 text-white font-semibold px-6"
+                    <Button
+                        class="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold px-6 border-0 shadow-lg"
                         @click="isCartOpen = true">
                         {{ isEditingOrder ? 'Kelola Pesanan' : 'Lihat Pesanan' }}
                     </Button>
@@ -590,69 +599,77 @@ const closeOrderSheet = () => {
 
             <!-- Cart Sheet (Order Management Modal) -->
             <Sheet v-model:open="isCartOpen">
-                <SheetContent side="bottom" class="h-[85vh] flex flex-col rounded-t-3xl">
-                    <SheetHeader class="border-b border-slate-200 dark:border-slate-700 pb-4">
-                        <div>
-                            <SheetTitle class="text-xl font-bold">
-                                {{ isEditingOrder ? `Pesanan: ${customerName}` : 'Pesanan Baru' }}
-                            </SheetTitle>
-                            <p v-if="isEditingOrder && hasNewItems" class="text-sm text-orange-600 mt-1">
-                                {{ newItemsOnly.length }} item baru ditambahkan
-                            </p>
+                <SheetContent side="bottom"
+                    class="h-[85vh] flex flex-col rounded-t-2xl border-t border-border overflow-hidden p-0"
+                    :style="{ backgroundColor: 'hsl(var(--card))' }">
+
+                    <!-- Header -->
+                    <SheetHeader class="border-b border-border p-4 flex-shrink-0">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <SheetTitle class="text-xl font-bold text-foreground">
+                                    {{ isEditingOrder ? `Pesanan: ${customerName}` : 'Pesanan Baru' }}
+                                </SheetTitle>
+                                <p v-if="isEditingOrder && hasNewItems" class="text-sm text-primary mt-1">
+                                    {{ newItemsOnly.length }} item baru ditambahkan
+                                </p>
+                            </div>
+                            <Button variant="ghost" size="icon" class="rounded-full" @click="isCartOpen = false">
+                                <X class="w-5 h-5" />
+                            </Button>
                         </div>
                     </SheetHeader>
 
-                    <div class="flex-1 overflow-y-auto py-4 space-y-3">
+                    <!-- Scrollable Content Area -->
+                    <div class="flex-1 overflow-y-auto p-4 space-y-3">
                         <!-- Empty State for New Orders -->
                         <div v-if="isCartEmpty && !isEditingOrder"
                             class="flex flex-col items-center justify-center h-full text-center">
-                            <div
-                                class="w-20 h-20 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-4">
-                                <ShoppingCart class="w-10 h-10 text-slate-400" />
+                            <div class="w-20 h-20 rounded-full bg-muted flex items-center justify-center mb-4">
+                                <ShoppingCart class="w-10 h-10 text-muted-foreground" />
                             </div>
-                            <h3 class="font-medium text-slate-600 dark:text-slate-300 mb-1">Keranjang Kosong</h3>
-                            <p class="text-sm text-slate-500">Tambahkan menu untuk memulai pesanan</p>
+                            <h3 class="font-medium text-muted-foreground mb-1">Keranjang Kosong</h3>
+                            <p class="text-sm text-muted-foreground">Tambahkan menu untuk memulai pesanan</p>
                         </div>
 
                         <!-- Existing Items (with staged deletion) -->
                         <template v-if="existingItemsOnly.length > 0">
-                            <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider px-1 mb-2">
+                            <div class="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-1 mb-2">
                                 Item Pesanan
                             </div>
                             <div v-for="(item, index) in cart" :key="`existing-${item.menu.id}`"
                                 v-show="item.isExisting" :class="[
                                     'flex items-center gap-3 p-3 rounded-xl transition-all',
                                     isMarkedForDeletion(item.itemId)
-                                        ? 'bg-red-100 dark:bg-red-950 opacity-60'
-                                        : 'bg-slate-100 dark:bg-slate-700'
+                                        ? 'bg-destructive/10 opacity-60'
+                                        : 'bg-muted/50'
                                 ]">
-                                <div
-                                    class="w-12 h-12 rounded-lg bg-slate-200 dark:bg-slate-600 overflow-hidden flex-shrink-0">
+                                <div class="w-12 h-12 rounded-lg bg-muted overflow-hidden flex-shrink-0">
                                     <img v-if="item.menu.image" :src="item.menu.image" :alt="item.menu.name"
                                         class="w-full h-full object-cover" />
                                     <div v-else class="w-full h-full flex items-center justify-center">
-                                        <UtensilsCrossed class="w-5 h-5 text-slate-400" />
+                                        <UtensilsCrossed class="w-5 h-5 text-muted-foreground" />
                                     </div>
                                 </div>
                                 <div class="flex-1 min-w-0">
                                     <h4 :class="[
                                         'font-medium text-sm truncate',
                                         isMarkedForDeletion(item.itemId)
-                                            ? 'line-through text-red-500'
-                                            : 'text-slate-600 dark:text-slate-300'
+                                            ? 'line-through text-destructive'
+                                            : 'text-foreground'
                                     ]">
                                         {{ item.menu.name }}
                                     </h4>
                                     <p :class="[
                                         'text-sm',
-                                        isMarkedForDeletion(item.itemId) ? 'line-through text-red-400' : 'text-slate-500'
+                                        isMarkedForDeletion(item.itemId) ? 'line-through text-destructive/70' : 'text-muted-foreground'
                                     ]">
                                         {{ item.quantity }}x @ Rp {{ formatPrice(item.menu.price) }}
                                     </p>
                                 </div>
                                 <div :class="[
                                     'text-sm font-medium',
-                                    isMarkedForDeletion(item.itemId) ? 'line-through text-red-400' : 'text-slate-500'
+                                    isMarkedForDeletion(item.itemId) ? 'line-through text-destructive/70' : 'text-muted-foreground'
                                 ]">
                                     Rp {{ formatPrice(item.menu.price * item.quantity) }}
                                 </div>
@@ -671,25 +688,24 @@ const closeOrderSheet = () => {
 
                         <!-- New Items (editable) -->
                         <template v-if="newItemsOnly.length > 0">
-                            <div class="text-xs font-semibold text-orange-600 uppercase tracking-wider px-1 mb-2 mt-4">
+                            <div class="text-xs font-semibold text-primary uppercase tracking-wider px-1 mb-2 mt-4">
                                 {{ isEditingOrder ? 'Item Baru (Tambahan)' : 'Item Pesanan' }}
                             </div>
                             <div v-for="(item, index) in cart" :key="`new-${item.menu.id}`" v-show="!item.isExisting"
-                                class="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-800 rounded-xl">
-                                <div
-                                    class="w-16 h-16 rounded-lg bg-slate-200 dark:bg-slate-700 overflow-hidden flex-shrink-0">
+                                class="flex items-center gap-3 p-3 bg-muted/30 rounded-xl">
+                                <div class="w-14 h-14 rounded-lg bg-muted overflow-hidden flex-shrink-0">
                                     <img v-if="item.menu.image" :src="item.menu.image" :alt="item.menu.name"
                                         class="w-full h-full object-cover" />
                                     <div v-else class="w-full h-full flex items-center justify-center">
-                                        <UtensilsCrossed class="w-6 h-6 text-slate-400" />
+                                        <UtensilsCrossed class="w-6 h-6 text-muted-foreground" />
                                     </div>
                                 </div>
 
                                 <div class="flex-1 min-w-0">
-                                    <h4 class="font-medium text-sm text-slate-900 dark:text-white truncate">
+                                    <h4 class="font-medium text-sm text-foreground truncate">
                                         {{ item.menu.name }}
                                     </h4>
-                                    <p class="text-sm font-semibold text-orange-600 dark:text-orange-400">
+                                    <p class="text-sm font-semibold text-primary">
                                         Rp {{ formatPrice(item.menu.price * item.quantity) }}
                                     </p>
                                 </div>
@@ -699,7 +715,7 @@ const closeOrderSheet = () => {
                                         @click="decrementQuantity(index)">
                                         <Minus class="w-4 h-4" />
                                     </Button>
-                                    <span class="w-8 text-center font-semibold text-slate-900 dark:text-white">
+                                    <span class="w-8 text-center font-semibold text-foreground">
                                         {{ item.quantity }}
                                     </span>
                                     <Button variant="outline" size="icon-sm" class="rounded-full"
@@ -709,131 +725,75 @@ const closeOrderSheet = () => {
                                 </div>
                             </div>
                         </template>
-                    </div>
 
-                    <!-- Customer Name & Total -->
-                    <div class="border-t border-slate-200 dark:border-slate-700 pt-4 space-y-4">
                         <!-- Customer Name (only for new orders) -->
-                        <div v-if="!isEditingOrder">
-                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                                Nama Pelanggan <span class="text-red-500">*</span>
+                        <div v-if="!isEditingOrder" class="pt-4">
+                            <label class="block text-sm font-medium text-foreground mb-2">
+                                Nama Pelanggan <span class="text-destructive">*</span>
                             </label>
                             <Input v-model="customerName" type="text" placeholder="Masukkan nama pelanggan..."
-                                class="bg-slate-50 dark:bg-slate-800" />
-                        </div>
-
-                        <!-- Order Summary -->
-                        <div class="bg-slate-100 dark:bg-slate-800 rounded-xl p-4">
-                            <div v-if="isEditingOrder && existingItemsOnly.length > 0"
-                                class="flex items-center justify-between mb-2 text-sm">
-                                <span class="text-slate-500">Item sebelumnya</span>
-                                <span class="text-slate-500">
-                                    Rp {{formatPrice(existingItemsOnly.reduce((sum, item) => sum + (item.menu.price *
-                                        item.quantity), 0))}}
-                                </span>
-                            </div>
-                            <div v-if="hasNewItems" class="flex items-center justify-between mb-2 text-sm">
-                                <span class="text-orange-600 font-medium">{{ isEditingOrder ? 'Tambahan baru' :
-                                    'Subtotal' }}</span>
-                                <span class="text-orange-600 font-medium">
-                                    Rp {{formatPrice(newItemsOnly.reduce((sum, item) => sum + (item.menu.price *
-                                        item.quantity),
-                                        0))}}
-                                </span>
-                            </div>
-                            <div
-                                class="flex items-center justify-between text-lg border-t border-slate-200 dark:border-slate-700 pt-2 mt-2">
-                                <span class="font-bold text-slate-900 dark:text-white">Total</span>
-                                <span class="font-bold text-orange-600 dark:text-orange-400">Rp {{
-                                    formatPrice(cartTotal) }}</span>
-                            </div>
+                                class="bg-background border-input" />
                         </div>
                     </div>
 
-                    <SheetFooter class="pt-4 gap-2">
-                        <!-- New Order: Process -->
-                        <template v-if="!isEditingOrder">
+                    <!-- Fixed Footer with Total & Actions -->
+                    <div class="p-4 border-t border-border bg-card flex-shrink-0">
+                        <!-- Total Section -->
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="text-lg font-medium text-muted-foreground">Total</span>
+                            <span class="text-2xl font-bold text-primary">Rp {{ formatPrice(cartTotal) }}</span>
+                        </div>
+
+                        <!-- Commit Deletions Button (staged) - Full Width when visible -->
+                        <Button v-if="itemsToDelete.length > 0"
+                            class="w-full h-12 font-bold bg-red-600 hover:bg-red-700 text-white rounded-xl mb-3"
+                            :disabled="isVoiding" @click="commitDeletions">
+                            <Trash2 class="w-5 h-5 mr-2" />
+                            Batalkan {{ itemsToDelete.length }} Item
+                        </Button>
+
+                        <!-- Save Add-ons (only if there are new items on existing order) -->
+                        <Button v-if="isEditingOrder && hasNewItems"
+                            class="w-full h-12 font-bold bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl mb-3"
+                            :disabled="isProcessing || itemsToDelete.length > 0" @click="addItemsToOrder">
+                            <Plus class="w-5 h-5 mr-2" />
+                            Simpan Tambahan ({{ newItemsOnly.length }} Item)
+                        </Button>
+
+                        <!-- Button Grid for Main Actions -->
+                        <div class="grid grid-cols-2 gap-3">
+                            <!-- Button 1: Tambah Lagi (Secondary) -->
                             <Button
-                                class="w-full h-14 text-lg font-bold bg-orange-500 hover:bg-orange-600 text-white rounded-xl shadow-lg"
-                                :disabled="isCartEmpty || !customerName.trim() || isProcessing" @click="processOrder">
-                                <ShoppingCart class="w-5 h-5 mr-2" />
-                                Proses Pesanan
+                                class="h-12 font-semibold bg-transparent border border-border text-foreground hover:bg-muted rounded-xl"
+                                :disabled="itemsToDelete.length > 0" @click="addMoreItems">
+                                <Plus class="w-4 h-4 mr-2" />
+                                Tambah Lagi
                             </Button>
-                        </template>
 
-                        <!-- Editing Order -->
-                        <template v-else>
-                            <div class="w-full space-y-2">
-                                <!-- Commit Deletions Button (staged) -->
-                                <Button v-if="itemsToDelete.length > 0"
-                                    class="w-full h-12 font-bold bg-red-600 hover:bg-red-700 text-white rounded-xl"
-                                    :disabled="isVoiding" @click="commitDeletions">
-                                    <Trash2 class="w-5 h-5 mr-2" />
-                                    Batalkan {{ itemsToDelete.length }} Item
-                                </Button>
+                            <!-- Button 2: Bayar Sekarang (Primary) -->
+                            <Button v-if="isEditingOrder"
+                                class="h-12 font-bold bg-primary text-primary-foreground shadow-lg shadow-primary/20 hover:bg-primary/90 rounded-xl"
+                                :disabled="isProcessing || hasNewItems || itemsToDelete.length > 0"
+                                @click="openCheckout">
+                                <CreditCard class="w-4 h-4 mr-2" />
+                                Bayar Sekarang
+                            </Button>
 
-                                <!-- Add More Items Button -->
-                                <Button
-                                    class="w-full h-12 font-bold bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl"
-                                    :disabled="itemsToDelete.length > 0" @click="addMoreItems">
-                                    <Plus class="w-5 h-5 mr-2" />
-                                    Tambah Menu
-                                </Button>
-
-                                <!-- Save Add-ons (only if there are new items) -->
-                                <Button v-if="hasNewItems"
-                                    class="w-full h-12 font-bold bg-orange-500 hover:bg-orange-600 text-white rounded-xl"
-                                    :disabled="isProcessing || itemsToDelete.length > 0" @click="addItemsToOrder">
-                                    <ShoppingCart class="w-5 h-5 mr-2" />
-                                    Simpan Tambahan
-                                </Button>
-
-                                <!-- Checkout Button (always visible when editing) -->
-                                <Button
-                                    class="w-full h-12 font-bold bg-green-600 hover:bg-green-700 text-white rounded-xl"
-                                    :disabled="isProcessing || hasNewItems || itemsToDelete.length > 0"
-                                    @click="openCheckout">
-                                    <CreditCard class="w-5 h-5 mr-2" />
-                                    Bayar / Checkout
-                                </Button>
-
-                                <p v-if="hasNewItems" class="text-xs text-center text-slate-500">
-                                    Simpan tambahan terlebih dahulu sebelum bayar
-                                </p>
-                                <p v-else-if="itemsToDelete.length > 0" class="text-xs text-center text-red-500">
-                                    Konfirmasi pembatalan item terlebih dahulu
-                                </p>
-                            </div>
-                        </template>
-                    </SheetFooter>
+                            <!-- New Order: Process Button -->
+                            <Button v-else
+                                class="h-12 font-bold bg-primary text-primary-foreground shadow-lg shadow-primary/20 hover:bg-primary/90 rounded-xl"
+                                :disabled="isCartEmpty || !customerName.trim() || isProcessing" @click="processOrder">
+                                <ShoppingCart class="w-4 h-4 mr-2" />
+                                Proses
+                            </Button>
+                        </div>
+                    </div>
                 </SheetContent>
             </Sheet>
 
-            <!-- Checkout Dialog -->
-            <CheckoutDialog v-model:open="isCheckoutOpen" :transaction="selectedTransaction"
-                @success="onCheckoutSuccess" />
+            <CheckoutDialog v-if="selectedTransaction" :open="isCheckoutOpen" :transaction="selectedTransaction"
+                @update:open="isCheckoutOpen = $event" @success="onCheckoutSuccess" />
 
-            <!-- Receipt Printer Handler -->
-            <ReceiptHandler />
         </div>
     </AppLayout>
 </template>
-
-<style scoped>
-.scrollbar-hide {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-}
-
-.scrollbar-hide::-webkit-scrollbar {
-    display: none;
-}
-
-.line-clamp-2 {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-}
-</style>

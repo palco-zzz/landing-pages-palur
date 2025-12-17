@@ -125,18 +125,18 @@ const deleteCategory = () => {
             <!-- Header -->
             <div class="flex items-center justify-between mb-6">
                 <div>
-                    <h1 class="text-2xl font-bold text-slate-900 dark:text-white">Manajemen Kategori</h1>
-                    <p class="text-sm text-slate-500">Kelola kategori menu</p>
+                    <h1 class="text-2xl font-bold text-foreground">Manajemen Kategori</h1>
+                    <p class="text-sm text-muted-foreground">Kelola kategori menu</p>
                 </div>
-                <Button class="bg-orange-500 hover:bg-orange-600" @click="openCreateDialog">
+                <Button class="bg-primary text-primary-foreground hover:bg-primary/90 shadow-md"
+                    @click="openCreateDialog">
                     <Plus class="w-4 h-4 mr-2" />
                     Tambah Kategori
                 </Button>
             </div>
 
             <!-- Table -->
-            <div
-                class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+            <div class="bg-card rounded-xl border border-border overflow-hidden shadow-sm">
                 <Table>
                     <TableHeader>
                         <TableRow>
@@ -149,15 +149,15 @@ const deleteCategory = () => {
                         <TableRow v-if="categories.length === 0">
                             <TableCell colspan="3" class="text-center py-12">
                                 <div class="flex flex-col items-center gap-2">
-                                    <Tags class="w-12 h-12 text-slate-300" />
-                                    <p class="text-slate-500">Belum ada kategori</p>
+                                    <Tags class="w-12 h-12 text-muted-foreground/20" />
+                                    <p class="text-muted-foreground">Belum ada kategori</p>
                                 </div>
                             </TableCell>
                         </TableRow>
                         <TableRow v-for="category in categories" :key="category.id">
                             <TableCell class="font-medium">
                                 <div class="flex items-center gap-2">
-                                    <Tags class="w-4 h-4 text-orange-500" />
+                                    <Tags class="w-4 h-4 text-primary" />
                                     {{ category.name }}
                                 </div>
                             </TableCell>
@@ -178,7 +178,8 @@ const deleteCategory = () => {
                                             <Pencil class="w-4 h-4 mr-2" />
                                             Edit
                                         </DropdownMenuItem>
-                                        <DropdownMenuItem v-if="category.menus_count === 0" class="text-red-600"
+                                        <DropdownMenuItem v-if="category.menus_count === 0"
+                                            class="text-destructive focus:text-destructive focus:bg-destructive/10"
                                             @click="confirmDelete(category.id)">
                                             <Trash2 class="w-4 h-4 mr-2" />
                                             Hapus
@@ -212,7 +213,8 @@ const deleteCategory = () => {
                         <Button type="button" variant="outline" @click="isDialogOpen = false">
                             Batal
                         </Button>
-                        <Button type="submit" class="bg-orange-500 hover:bg-orange-600" :disabled="form.processing">
+                        <Button type="submit" class="bg-primary text-primary-foreground hover:bg-primary/90"
+                            :disabled="form.processing">
                             {{ editingCategory ? 'Simpan' : 'Tambah' }}
                         </Button>
                     </DialogFooter>
@@ -229,7 +231,7 @@ const deleteCategory = () => {
                         Konfirmasi penghapusan kategori.
                     </DialogDescription>
                 </DialogHeader>
-                <p class="text-sm text-slate-600 dark:text-slate-400">
+                <p class="text-sm text-muted-foreground">
                     Apakah Anda yakin ingin menghapus kategori ini?
                 </p>
                 <DialogFooter class="gap-2">

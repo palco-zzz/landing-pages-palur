@@ -88,8 +88,8 @@ const roleLabels: Record<string, string> = {
 };
 
 const roleColors: Record<string, string> = {
-    admin: 'bg-red-100 text-red-800 border-red-300',
-    cashier: 'bg-blue-100 text-blue-800 border-blue-300',
+    admin: 'bg-destructive/10 text-destructive border-destructive/20',
+    cashier: 'bg-blue-500/10 text-blue-600 border-blue-500/20',
 };
 
 // Methods
@@ -171,18 +171,18 @@ const deleteUser = () => {
             <!-- Header -->
             <div class="flex items-center justify-between mb-6">
                 <div>
-                    <h1 class="text-2xl font-bold text-slate-900 dark:text-white">Manajemen Pengguna</h1>
-                    <p class="text-sm text-slate-500">Kelola akun admin dan kasir</p>
+                    <h1 class="text-2xl font-bold text-foreground">Manajemen Pengguna</h1>
+                    <p class="text-sm text-muted-foreground">Kelola akun admin dan kasir</p>
                 </div>
-                <Button class="bg-orange-500 hover:bg-orange-600" @click="openCreateDialog">
+                <Button class="bg-primary text-primary-foreground hover:bg-primary/90 shadow-md"
+                    @click="openCreateDialog">
                     <Plus class="w-4 h-4 mr-2" />
                     Tambah User
                 </Button>
             </div>
 
             <!-- Table -->
-            <div
-                class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+            <div class="bg-card rounded-xl border border-border overflow-hidden shadow-sm">
                 <div class="overflow-x-auto">
                     <Table>
                         <TableHeader>
@@ -198,8 +198,8 @@ const deleteUser = () => {
                             <TableRow v-if="users.length === 0">
                                 <TableCell colspan="5" class="text-center py-12">
                                     <div class="flex flex-col items-center gap-2">
-                                        <Users class="w-12 h-12 text-slate-300" />
-                                        <p class="text-slate-500">Belum ada pengguna</p>
+                                        <Users class="w-12 h-12 text-muted-foreground/20" />
+                                        <p class="text-muted-foreground">Belum ada pengguna</p>
                                     </div>
                                 </TableCell>
                             </TableRow>
@@ -207,18 +207,19 @@ const deleteUser = () => {
                                 <TableCell class="font-medium">
                                     <div class="flex items-center gap-2">
                                         {{ user.name }}
-                                        <Badge v-if="user.id === currentUserId" variant="outline" class="text-xs">
+                                        <Badge v-if="user.id === currentUserId" variant="outline"
+                                            class="text-xs border-primary/20 text-primary bg-primary/5">
                                             Anda
                                         </Badge>
                                     </div>
                                 </TableCell>
-                                <TableCell class="text-slate-500">{{ user.email }}</TableCell>
+                                <TableCell class="text-muted-foreground">{{ user.email }}</TableCell>
                                 <TableCell>
                                     <Badge variant="outline" :class="roleColors[user.role]">
                                         {{ roleLabels[user.role] }}
                                     </Badge>
                                 </TableCell>
-                                <TableCell class="text-sm text-slate-500">
+                                <TableCell class="text-sm text-muted-foreground">
                                     {{ formatDate(user.created_at) }}
                                 </TableCell>
                                 <TableCell class="text-right">
@@ -233,7 +234,8 @@ const deleteUser = () => {
                                                 <Pencil class="w-4 h-4 mr-2" />
                                                 Edit
                                             </DropdownMenuItem>
-                                            <DropdownMenuItem v-if="user.id !== currentUserId" class="text-red-600"
+                                            <DropdownMenuItem v-if="user.id !== currentUserId"
+                                                class="text-destructive focus:text-destructive focus:bg-destructive/10"
                                                 @click="confirmDelete(user.id)">
                                                 <Trash2 class="w-4 h-4 mr-2" />
                                                 Hapus
@@ -276,7 +278,7 @@ const deleteUser = () => {
                         <Label for="password">Password</Label>
                         <Input id="password" v-model="form.password" type="password" placeholder="Minimal 8 karakter"
                             :required="!editingUser" />
-                        <p v-if="editingUser" class="text-xs text-slate-500">
+                        <p v-if="editingUser" class="text-xs text-muted-foreground">
                             Kosongkan jika tidak ingin mengganti password
                         </p>
                     </div>
@@ -299,7 +301,8 @@ const deleteUser = () => {
                         <Button type="button" variant="outline" @click="isDialogOpen = false">
                             Batal
                         </Button>
-                        <Button type="submit" class="bg-orange-500 hover:bg-orange-600" :disabled="form.processing">
+                        <Button type="submit" class="bg-primary text-primary-foreground hover:bg-primary/90"
+                            :disabled="form.processing">
                             {{ editingUser ? 'Simpan Perubahan' : 'Tambah User' }}
                         </Button>
                     </DialogFooter>
@@ -316,7 +319,7 @@ const deleteUser = () => {
                         Konfirmasi penghapusan pengguna.
                     </DialogDescription>
                 </DialogHeader>
-                <p class="text-sm text-slate-600 dark:text-slate-400">
+                <p class="text-sm text-muted-foreground">
                     Apakah Anda yakin ingin menghapus pengguna ini? Tindakan ini tidak dapat dibatalkan.
                 </p>
                 <DialogFooter class="gap-2">

@@ -123,7 +123,7 @@ watch(() => props.open, (isOpen) => {
 
 <template>
     <Dialog :open="open" @update:open="$emit('update:open', $event)">
-        <DialogContent class="sm:max-w-md">
+        <DialogContent class="sm:max-w-md bg-card text-card-foreground border-border">
             <DialogHeader>
                 <DialogTitle class="text-xl">
                     Pembayaran - {{ transaction?.customer_name }}
@@ -135,9 +135,9 @@ watch(() => props.open, (isOpen) => {
 
             <div class="space-y-6 py-4">
                 <!-- Total Display -->
-                <div class="text-center py-6 bg-slate-100 dark:bg-slate-800 rounded-xl">
-                    <p class="text-sm text-slate-500 mb-1">Total Pembayaran</p>
-                    <p class="text-4xl font-bold text-orange-600 dark:text-orange-400">
+                <div class="text-center py-6 bg-muted/50 rounded-xl">
+                    <p class="text-sm text-muted-foreground mb-1">Total Pembayaran</p>
+                    <p class="text-4xl font-bold text-primary">
                         Rp {{ formatPrice(totalAmount) }}
                     </p>
                 </div>
@@ -145,13 +145,13 @@ watch(() => props.open, (isOpen) => {
                 <!-- Payment Method Toggle -->
                 <div class="grid grid-cols-2 gap-3">
                     <Button :variant="paymentMethod === 'cash' ? 'default' : 'outline'" class="h-16 flex-col gap-2"
-                        :class="paymentMethod === 'cash' ? 'bg-orange-500 hover:bg-orange-600' : ''"
+                        :class="paymentMethod === 'cash' ? 'bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground' : 'hover:bg-accent hover:text-accent-foreground'"
                         @click="paymentMethod = 'cash'">
                         <Banknote class="w-6 h-6" />
                         <span class="font-semibold">TUNAI</span>
                     </Button>
                     <Button :variant="paymentMethod === 'qris' ? 'default' : 'outline'" class="h-16 flex-col gap-2"
-                        :class="paymentMethod === 'qris' ? 'bg-orange-500 hover:bg-orange-600' : ''"
+                        :class="paymentMethod === 'qris' ? 'bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground' : 'hover:bg-accent hover:text-accent-foreground'"
                         @click="paymentMethod = 'qris'">
                         <QrCode class="w-6 h-6" />
                         <span class="font-semibold">QRIS</span>
@@ -162,11 +162,11 @@ watch(() => props.open, (isOpen) => {
                 <template v-if="paymentMethod === 'cash'">
                     <!-- Cash Input -->
                     <div>
-                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                        <label class="block text-sm font-medium text-foreground mb-2">
                             Uang Diterima
                         </label>
                         <Input v-model.number="cashReceived" type="number" placeholder="0"
-                            class="text-lg font-semibold text-right" />
+                            class="text-lg font-semibold text-right bg-background border-input" />
                     </div>
 
                     <!-- Quick Amount Buttons -->
@@ -187,15 +187,15 @@ watch(() => props.open, (isOpen) => {
 
                     <!-- Change Display -->
                     <div class="text-center py-4 rounded-xl" :class="isChangeNegative
-                        ? 'bg-red-100 dark:bg-red-950'
-                        : 'bg-green-100 dark:bg-green-950'">
+                        ? 'bg-destructive/10'
+                        : 'bg-green-500/10'">
                         <p class="text-sm mb-1" :class="isChangeNegative
-                            ? 'text-red-600 dark:text-red-400'
+                            ? 'text-destructive'
                             : 'text-green-600 dark:text-green-400'">
                             {{ isChangeNegative ? 'Kurang' : 'Kembalian' }}
                         </p>
                         <p class="text-2xl font-bold" :class="isChangeNegative
-                            ? 'text-red-600 dark:text-red-400'
+                            ? 'text-destructive'
                             : 'text-green-600 dark:text-green-400'">
                             Rp {{ formatPrice(Math.abs(changeAmount)) }}
                         </p>
@@ -204,12 +204,12 @@ watch(() => props.open, (isOpen) => {
 
                 <!-- QRIS Section -->
                 <template v-else>
-                    <div class="text-center py-8 bg-slate-50 dark:bg-slate-800 rounded-xl">
-                        <QrCode class="w-16 h-16 mx-auto text-slate-400 mb-4" />
-                        <p class="text-sm text-slate-500">
+                    <div class="text-center py-8 bg-muted/30 rounded-xl">
+                        <QrCode class="w-16 h-16 mx-auto text-muted-foreground mb-4" />
+                        <p class="text-sm text-foreground">
                             Minta pelanggan scan QRIS untuk pembayaran
                         </p>
-                        <p class="text-xs text-slate-400 mt-2">
+                        <p class="text-xs text-muted-foreground mt-2">
                             Konfirmasi setelah pembayaran diterima
                         </p>
                     </div>

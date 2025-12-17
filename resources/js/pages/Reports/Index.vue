@@ -228,47 +228,46 @@ const formatPrice = (price: number): string => {
         <div class="flex flex-col gap-6 p-4 md:p-6">
             <!-- Header Title -->
             <div class="flex flex-col">
-                <h1 class="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">
+                <h1 class="text-2xl md:text-3xl font-bold text-foreground">
                     Laporan & Analitik
                 </h1>
-                <p class="text-slate-500 dark:text-slate-400 mt-1">
+                <p class="text-muted-foreground mt-1">
                     Pantau performa warung dengan data real-time
                 </p>
             </div>
 
             <!-- CONTROL BAR (Filter & Actions) -->
             <div
-                class="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-5 mb-2 flex flex-col md:flex-row justify-between md:items-end gap-4 backdrop-blur-sm">
+                class="bg-card border border-border rounded-xl p-5 mb-6 flex flex-col md:flex-row justify-between md:items-end gap-4 shadow-sm">
                 <!-- Left: Filter Logic -->
                 <div class="flex flex-col gap-3 w-full md:w-auto">
                     <div class="flex items-center gap-3">
-                        <Label class="text-zinc-400 text-xs font-medium uppercase tracking-wider">Periode
+                        <Label class="text-muted-foreground text-xs font-medium uppercase tracking-wider">Periode
                             Laporan</Label>
                         <!-- Quick Chips -->
                         <div class="flex gap-2">
                             <button @click="applyPreset('today')" type="button"
-                                class="text-[10px] px-2 py-1 rounded-md bg-zinc-800 hover:bg-zinc-700 text-zinc-300 transition border border-zinc-700">
+                                class="text-[10px] px-3 py-1.5 rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/80 transition font-medium">
                                 Hari Ini
                             </button>
                             <button @click="applyPreset('this_month')" type="button"
-                                class="text-[10px] px-2 py-1 rounded-md bg-zinc-800 hover:bg-zinc-700 text-zinc-300 transition border border-zinc-700">
+                                class="text-[10px] px-3 py-1.5 rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/80 transition font-medium">
                                 Bulan Ini
                             </button>
                         </div>
                     </div>
 
                     <!-- Date Picker -->
-                    <VueDatePicker v-model="dateRange" range :dark="true" format="dd MMM yyyy"
-                        :enable-time-picker="false" :auto-apply="true" :close-on-auto-apply="true"
-                        menu-class-name="!bg-zinc-900 !border-zinc-800 !rounded-xl"
-                        calendar-cell-class-name="hover:!bg-orange-500/20 rounded-full" :style="{ minWidth: '260px' }">
+                    <VueDatePicker v-model="dateRange" range format="dd MMM yyyy" :enable-time-picker="false"
+                        :auto-apply="true" :close-on-auto-apply="true" :style="{ minWidth: '260px' }">
                         <template #trigger>
                             <div
-                                class="bg-black/40 border border-zinc-700 hover:border-orange-500/50 text-white rounded-xl px-4 py-2.5 flex items-center justify-between gap-3 cursor-pointer transition group w-full md:w-[280px]">
-                                <span class="text-sm font-medium text-zinc-200">
+                                class="bg-background border border-input hover:border-primary/50 text-foreground rounded-lg px-4 py-2.5 flex items-center justify-between gap-3 cursor-pointer transition group w-full md:w-[280px]">
+                                <span class="text-sm font-medium">
                                     {{ dateRange ? formatDateTrigger(dateRange) : 'Pilih Rentang Tanggal' }}
                                 </span>
-                                <Calendar class="w-4 h-4 text-zinc-500 group-hover:text-orange-500 transition-colors" />
+                                <Calendar
+                                    class="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
                             </div>
                         </template>
                     </VueDatePicker>
@@ -277,12 +276,12 @@ const formatPrice = (price: number): string => {
                 <!-- Right: Actions -->
                 <div class="flex flex-row gap-3 w-full md:w-auto">
                     <Button @click="exportPdf" variant="outline"
-                        class="flex-1 md:flex-none bg-red-500/10 text-red-500 border-red-500/20 hover:bg-red-500 hover:text-white hover:border-red-500 transition-all rounded-xl">
+                        class="flex-1 md:flex-none bg-red-50 text-red-600 border-red-200 hover:bg-red-100 hover:text-red-700 hover:border-red-300 transition-all rounded-xl shadow-sm">
                         <Download class="w-4 h-4 mr-2" />
                         PDF
                     </Button>
                     <Button @click="exportExcel" variant="outline"
-                        class="flex-1 md:flex-none bg-emerald-500/10 text-emerald-500 border-emerald-500/20 hover:bg-emerald-500 hover:text-white hover:border-emerald-500 transition-all rounded-xl">
+                        class="flex-1 md:flex-none bg-emerald-50 text-emerald-600 border-emerald-200 hover:bg-emerald-100 hover:text-emerald-700 hover:border-emerald-300 transition-all rounded-xl shadow-sm">
                         <FileSpreadsheet class="w-4 h-4 mr-2" />
                         Excel
                     </Button>
@@ -380,7 +379,7 @@ const formatPrice = (price: number): string => {
                 <Card>
                     <CardHeader>
                         <div class="flex items-center gap-2">
-                            <BarChart3 class="w-5 h-5 text-purple-500" />
+                            <BarChart3 class="w-5 h-5 text-primary" />
                             <CardTitle>Performa Menu</CardTitle>
                         </div>
                         <CardDescription>Menu terlaris dan paling sedikit terjual</CardDescription>
@@ -394,19 +393,19 @@ const formatPrice = (price: number): string => {
                             </h4>
                             <div class="space-y-2">
                                 <div v-for="(menu, index) in topMenus" :key="menu.name"
-                                    class="flex items-center justify-between p-2 bg-green-50 dark:bg-green-950 rounded-lg">
-                                    <div class="flex items-center gap-2">
+                                    class="flex items-center justify-between p-3 bg-card border border-border shadow-sm rounded-lg hover:border-green-500/50 transition-colors">
+                                    <div class="flex items-center gap-3">
                                         <span
-                                            class="w-6 h-6 flex items-center justify-center bg-green-500 text-white text-xs font-bold rounded-full">
+                                            class="w-6 h-6 flex items-center justify-center bg-green-100 text-green-700 text-xs font-bold rounded-full border border-green-200">
                                             {{ index + 1 }}
                                         </span>
-                                        <span class="text-sm font-medium">{{ menu.name }}</span>
+                                        <span class="text-sm font-medium text-foreground">{{ menu.name }}</span>
                                     </div>
-                                    <span class="text-sm font-semibold text-green-600">
+                                    <span class="text-sm font-bold text-green-600">
                                         {{ menu.total_sold }} terjual
                                     </span>
                                 </div>
-                                <p v-if="topMenus.length === 0" class="text-sm text-slate-500 text-center py-2">
+                                <p v-if="topMenus.length === 0" class="text-sm text-muted-foreground text-center py-2">
                                     Tidak ada data
                                 </p>
                             </div>
@@ -419,19 +418,20 @@ const formatPrice = (price: number): string => {
                             </h4>
                             <div class="space-y-2">
                                 <div v-for="(menu, index) in bottomMenus" :key="menu.name"
-                                    class="flex items-center justify-between p-2 bg-red-50 dark:bg-red-950 rounded-lg">
-                                    <div class="flex items-center gap-2">
+                                    class="flex items-center justify-between p-3 bg-card border border-border shadow-sm rounded-lg hover:border-red-500/50 transition-colors">
+                                    <div class="flex items-center gap-3">
                                         <span
-                                            class="w-6 h-6 flex items-center justify-center bg-red-500 text-white text-xs font-bold rounded-full">
+                                            class="w-6 h-6 flex items-center justify-center bg-red-100 text-red-700 text-xs font-bold rounded-full border border-red-200">
                                             {{ index + 1 }}
                                         </span>
-                                        <span class="text-sm font-medium">{{ menu.name }}</span>
+                                        <span class="text-sm font-medium text-foreground">{{ menu.name }}</span>
                                     </div>
-                                    <span class="text-sm font-semibold text-red-600">
+                                    <span class="text-sm font-bold text-red-600">
                                         {{ menu.total_sold }} terjual
                                     </span>
                                 </div>
-                                <p v-if="bottomMenus.length === 0" class="text-sm text-slate-500 text-center py-2">
+                                <p v-if="bottomMenus.length === 0"
+                                    class="text-sm text-muted-foreground text-center py-2">
                                     Tidak ada data
                                 </p>
                             </div>

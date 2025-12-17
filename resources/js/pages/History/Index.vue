@@ -158,7 +158,7 @@ const paymentMethodLabels: Record<string, string> = {
 
 const paymentMethodColors: Record<string, string> = {
     cash: 'bg-green-100 text-green-800 border-green-300',
-    qris: 'bg-purple-100 text-purple-800 border-purple-300',
+    qris: 'bg-primary/10 text-primary border-primary/20',
     transfer: 'bg-blue-100 text-blue-800 border-blue-300',
 };
 
@@ -260,114 +260,113 @@ const goToPage = (url: string | null) => {
         <div class="p-6">
             <!-- Header -->
             <div class="mb-6">
-                <h1 class="text-2xl font-bold text-slate-900 dark:text-white">Riwayat Transaksi</h1>
-                <p class="text-sm text-slate-500">Lihat dan cetak ulang transaksi yang sudah selesai</p>
+                <h1 class="text-2xl font-bold text-foreground">Riwayat Transaksi</h1>
+                <p class="text-sm text-muted-foreground">Lihat dan cetak ulang transaksi yang sudah selesai</p>
             </div>
 
             <!-- Smart Filter Bar -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6 p-4 bg-zinc-100 dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-700">
+            <div
+                class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6 p-5 bg-card rounded-xl border border-border shadow-sm">
                 <!-- Preset Dropdown -->
                 <div class="relative">
-                    <label class="block text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1.5">Filter Cepat</label>
+                    <label class="block text-sm font-medium text-muted-foreground mb-1.5">Filter Cepat</label>
                     <div class="relative">
-                        <select
-                            v-model="presetFilter"
-                            class="w-full h-10 pl-3 pr-10 bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-600 rounded-lg text-sm text-zinc-900 dark:text-zinc-100 appearance-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
-                        >
+                        <select v-model="presetFilter"
+                            class="w-full h-10 pl-3 pr-10 bg-background border border-input text-foreground rounded-lg text-sm appearance-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors">
                             <option value="hari_ini">Hari Ini</option>
                             <option value="kemarin">Kemarin</option>
                             <option value="7_hari">7 Hari Terakhir</option>
                             <option value="bulan_ini">Bulan Ini</option>
                             <option value="custom">Custom</option>
                         </select>
-                        <ChevronDown class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 pointer-events-none" />
+                        <ChevronDown
+                            class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
                     </div>
                 </div>
 
                 <!-- Start Date -->
                 <div class="relative">
-                    <label class="block text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1.5">Dari Tanggal</label>
+                    <label class="block text-sm font-medium text-muted-foreground mb-1.5">Dari Tanggal</label>
                     <div class="relative">
-                        <Calendar class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
-                        <input
-                            v-model="startDate"
-                            type="date"
-                            :disabled="presetFilter !== 'custom'"
-                            class="w-full h-10 pl-10 pr-3 bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-600 rounded-lg text-sm text-zinc-900 dark:text-zinc-100 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-                        />
+                        <Calendar class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                        <input v-model="startDate" type="date" :disabled="presetFilter !== 'custom'"
+                            class="w-full h-10 pl-10 pr-3 bg-background border border-input text-foreground rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors disabled:opacity-60 disabled:cursor-not-allowed" />
                     </div>
                 </div>
 
                 <!-- End Date -->
                 <div class="relative">
-                    <label class="block text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1.5">Sampai Tanggal</label>
+                    <label class="block text-sm font-medium text-muted-foreground mb-1.5">Sampai Tanggal</label>
                     <div class="relative">
-                        <Calendar class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
-                        <input
-                            v-model="endDate"
-                            type="date"
-                            :disabled="presetFilter !== 'custom'"
-                            class="w-full h-10 pl-10 pr-3 bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-600 rounded-lg text-sm text-zinc-900 dark:text-zinc-100 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-                        />
+                        <Calendar class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                        <input v-model="endDate" type="date" :disabled="presetFilter !== 'custom'"
+                            class="w-full h-10 pl-10 pr-3 bg-background border border-input text-foreground rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors disabled:opacity-60 disabled:cursor-not-allowed" />
                     </div>
                 </div>
 
                 <!-- Search Input -->
                 <div class="relative">
-                    <label class="block text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1.5">Cari Pelanggan</label>
+                    <label class="block text-sm font-medium text-muted-foreground mb-1.5">Cari Pelanggan</label>
                     <div class="relative">
-                        <Search class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
-                        <input
-                            v-model="searchFilter"
-                            type="text"
-                            placeholder="Nama pelanggan..."
-                            class="w-full h-10 pl-10 pr-3 bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-600 rounded-lg text-sm text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
-                        />
+                        <Search class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                        <input v-model="searchFilter" type="text" placeholder="Nama pelanggan..."
+                            class="w-full h-10 pl-10 pr-3 bg-background border border-input text-foreground placeholder:text-muted-foreground rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors" />
                     </div>
                 </div>
             </div>
 
             <!-- Table -->
-            <div
-                class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+            <div class="bg-card rounded-xl border border-border overflow-hidden shadow-sm mt-6">
                 <div class="overflow-x-auto">
                     <Table>
-                        <TableHeader>
+                        <TableHeader class="bg-muted/40 border-b border-border">
                             <TableRow>
-                                <TableHead class="w-16">#</TableHead>
-                                <TableHead>Waktu</TableHead>
-                                <TableHead>Pelanggan</TableHead>
-                                <TableHead>Kasir</TableHead>
-                                <TableHead>Metode</TableHead>
-                                <TableHead class="text-right">Total</TableHead>
-                                <TableHead class="text-right w-28">Aksi</TableHead>
+                                <TableHead
+                                    class="w-16 text-xs font-semibold text-muted-foreground uppercase tracking-wider">#
+                                </TableHead>
+                                <TableHead class="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                                    Waktu</TableHead>
+                                <TableHead class="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                                    Pelanggan</TableHead>
+                                <TableHead class="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                                    Kasir</TableHead>
+                                <TableHead class="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                                    Metode</TableHead>
+                                <TableHead
+                                    class="text-right text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                                    Total</TableHead>
+                                <TableHead
+                                    class="text-right w-28 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                                    Aksi</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             <TableRow v-if="transactions.data.length === 0">
                                 <TableCell colspan="7" class="text-center py-12">
-                                    <p class="text-slate-500">Tidak ada transaksi pada rentang tanggal ini</p>
+                                    <p class="text-muted-foreground">Tidak ada transaksi pada rentang tanggal ini</p>
                                 </TableCell>
                             </TableRow>
-                            <TableRow v-for="tx in transactions.data" :key="tx.id">
-                                <TableCell class="font-mono text-sm text-slate-500">
+                            <TableRow v-for="tx in transactions.data" :key="tx.id"
+                                class="border-b border-border hover:bg-muted/20 transition-colors">
+                                <TableCell class="font-mono text-sm text-muted-foreground">
                                     {{ tx.uuid ? tx.uuid.substring(0, 8) : tx.id }}
                                 </TableCell>
-                                <TableCell class="text-sm">
+                                <TableCell class="text-sm text-foreground">
                                     {{ formatDateTime(tx.created_at) }}
                                 </TableCell>
-                                <TableCell class="font-medium">
+                                <TableCell class="font-medium text-foreground">
                                     {{ tx.customer_name }}
                                 </TableCell>
-                                <TableCell class="text-sm text-slate-500">
+                                <TableCell class="text-sm text-muted-foreground">
                                     {{ tx.user?.name || '-' }}
                                 </TableCell>
                                 <TableCell>
-                                    <Badge variant="outline" :class="paymentMethodColors[tx.payment_method]">
+                                    <span
+                                        class="bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-full px-2 py-0.5 text-xs font-medium">
                                         {{ paymentMethodLabels[tx.payment_method] || tx.payment_method }}
-                                    </Badge>
+                                    </span>
                                 </TableCell>
-                                <TableCell class="text-right font-medium">
+                                <TableCell class="text-right font-medium text-foreground">
                                     Rp {{ formatPrice(tx.total_amount) }}
                                 </TableCell>
                                 <TableCell class="text-right">
@@ -383,14 +382,14 @@ const goToPage = (url: string | null) => {
 
                 <!-- Pagination -->
                 <div v-if="transactions.last_page > 1"
-                    class="flex items-center justify-between px-4 py-3 border-t border-slate-200 dark:border-slate-800">
-                    <p class="text-sm text-slate-500">
+                    class="flex items-center justify-between px-4 py-3 border-t border-border">
+                    <p class="text-sm text-muted-foreground">
                         Menampilkan {{ transactions.data.length }} dari {{ transactions.total }} transaksi
                     </p>
                     <div class="flex gap-1">
                         <Button v-for="link in transactions.links" :key="link.label" variant="outline" size="sm"
                             :disabled="!link.url || link.active"
-                            :class="{ 'bg-orange-500 text-white border-orange-500': link.active }"
+                            :class="{ 'bg-primary text-primary-foreground border-primary': link.active }"
                             @click="goToPage(link.url)" v-html="link.label" />
                     </div>
                 </div>

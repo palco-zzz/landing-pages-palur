@@ -90,7 +90,7 @@ const chartData = computed(() => {
         datasets: [
             {
                 label: 'Pendapatan',
-                backgroundColor: '#f97316',
+                backgroundColor: '#f59e0b', // Amber 500
                 borderRadius: 8,
                 data: props.chart.data,
             },
@@ -109,6 +109,11 @@ const chartOptions = {
             callbacks: {
                 label: (context: any) => `Rp ${formatFullPrice(context.raw)}`,
             },
+            backgroundColor: 'hsl(var(--card))',
+            titleColor: 'hsl(var(--card-foreground))',
+            bodyColor: 'hsl(var(--card-foreground))',
+            borderColor: 'hsl(var(--border))',
+            borderWidth: 1,
         },
     },
     scales: {
@@ -116,8 +121,20 @@ const chartOptions = {
             beginAtZero: true,
             ticks: {
                 callback: (value: string | number) => formatPrice(Number(value)),
+                color: '#71717a', // Zinc 500
             },
+            grid: {
+                color: 'hsl(var(--border) / 0.5)',
+            }
         },
+        x: {
+            ticks: {
+                color: '#71717a', // Zinc 500
+            },
+            grid: {
+                display: false,
+            }
+        }
     },
 };
 </script>
@@ -133,13 +150,13 @@ const chartOptions = {
                 <!-- Header -->
                 <div class="flex items-center justify-between">
                     <div>
-                        <h1 class="text-2xl font-bold text-slate-900 dark:text-white">
-                            Selamat Datang, {{ user?.name }}! 👋
+                        <h1 class="text-2xl font-bold text-foreground">
+                            Selamat Datang, <span class="text-primary">{{ user?.name }}</span>! 👋
                         </h1>
-                        <p class="text-sm text-slate-500">Ringkasan bisnis hari ini</p>
+                        <p class="text-sm text-muted-foreground">Ringkasan bisnis hari ini</p>
                     </div>
                     <Link :href="route('pos.index')">
-                        <Button class="bg-orange-500 hover:bg-orange-600">
+                        <Button class="bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm border-0">
                             <Store class="w-4 h-4 mr-2" />
                             Buka POS
                         </Button>
@@ -149,61 +166,64 @@ const chartOptions = {
                 <!-- Stats Cards -->
                 <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
                     <!-- Today Revenue -->
-                    <Card class="bg-gradient-to-br from-orange-500 to-orange-600 text-white border-0">
-                        <CardHeader class="pb-2">
+                    <Card class="bg-card text-card-foreground border border-border shadow-sm rounded-xl p-6">
+                        <CardHeader class="p-0 pb-2">
                             <div class="flex items-center justify-between">
-                                <CardTitle class="text-sm font-medium opacity-90">Omset Hari Ini</CardTitle>
-                                <DollarSign class="w-5 h-5 opacity-75" />
+                                <CardTitle class="text-sm font-medium text-muted-foreground">Omset Hari Ini</CardTitle>
+                                <DollarSign class="w-5 h-5 text-muted-foreground" />
                             </div>
                         </CardHeader>
-                        <CardContent>
-                            <p class="text-2xl font-bold">Rp {{ formatFullPrice(stats.today_revenue) }}</p>
+                        <CardContent class="p-0">
+                            <p class="text-3xl font-bold text-foreground">Rp {{ formatFullPrice(stats.today_revenue) }}
+                            </p>
                         </CardContent>
                     </Card>
 
                     <!-- Today Count -->
-                    <Card>
-                        <CardHeader class="pb-2">
+                    <Card class="bg-card text-card-foreground border border-border shadow-sm rounded-xl p-6">
+                        <CardHeader class="p-0 pb-2">
                             <div class="flex items-center justify-between">
-                                <CardTitle class="text-sm font-medium text-slate-500">Total Pesanan</CardTitle>
-                                <ShoppingBag class="w-5 h-5 text-slate-400" />
+                                <CardTitle class="text-sm font-medium text-muted-foreground">Total Pesanan</CardTitle>
+                                <ShoppingBag class="w-5 h-5 text-muted-foreground" />
                             </div>
                         </CardHeader>
-                        <CardContent>
-                            <p class="text-2xl font-bold text-slate-900 dark:text-white">{{ stats.today_count }}</p>
-                            <p class="text-xs text-slate-500 mt-1">
+                        <CardContent class="p-0">
+                            <p class="text-3xl font-bold text-foreground">
+                                {{ stats.today_count }}
+                            </p>
+                            <p class="text-xs text-muted-foreground mt-1">
                                 {{ stats.active_orders }} pesanan aktif
                             </p>
                         </CardContent>
                     </Card>
 
                     <!-- Cash Stats -->
-                    <Card>
-                        <CardHeader class="pb-2">
+                    <Card class="bg-card text-card-foreground border border-border shadow-sm rounded-xl p-6">
+                        <CardHeader class="p-0 pb-2">
                             <div class="flex items-center justify-between">
-                                <CardTitle class="text-sm font-medium text-slate-500">Tunai</CardTitle>
-                                <Wallet class="w-5 h-5 text-green-500" />
+                                <CardTitle class="text-sm font-medium text-muted-foreground">Tunai</CardTitle>
+                                <Wallet class="w-5 h-5 text-muted-foreground" />
                             </div>
                         </CardHeader>
-                        <CardContent>
-                            <p class="text-2xl font-bold text-slate-900 dark:text-white">{{ stats.cash.count }}</p>
-                            <p class="text-xs text-slate-500 mt-1">
+                        <CardContent class="p-0">
+                            <p class="text-3xl font-bold text-foreground">{{ stats.cash.count }}</p>
+                            <p class="text-xs text-muted-foreground mt-1">
                                 Rp {{ formatPrice(stats.cash.total) }}
                             </p>
                         </CardContent>
                     </Card>
 
                     <!-- QRIS Stats -->
-                    <Card>
-                        <CardHeader class="pb-2">
+                    <Card class="bg-card text-card-foreground border border-border shadow-sm rounded-xl p-6">
+                        <CardHeader class="p-0 pb-2">
                             <div class="flex items-center justify-between">
-                                <CardTitle class="text-sm font-medium text-slate-500">QRIS</CardTitle>
-                                <QrCode class="w-5 h-5 text-purple-500" />
+                                <CardTitle class="text-sm font-medium text-muted-foreground">QRIS</CardTitle>
+                                <QrCode class="w-5 h-5 text-muted-foreground" />
                             </div>
                         </CardHeader>
-                        <CardContent>
-                            <p class="text-2xl font-bold text-slate-900 dark:text-white">{{ stats.qris.count }}</p>
-                            <p class="text-xs text-slate-500 mt-1">
+                        <CardContent class="p-0">
+                            <p class="text-3xl font-bold text-foreground">{{ stats.qris.count }}</p>
+                            <p class="text-xs text-muted-foreground mt-1">
                                 Rp {{ formatPrice(stats.qris.total) }}
                             </p>
                         </CardContent>
@@ -213,10 +233,10 @@ const chartOptions = {
                 <!-- Charts Section -->
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <!-- Revenue Chart -->
-                    <Card class="lg:col-span-2">
+                    <Card class="lg:col-span-2 bg-card text-card-foreground border border-border shadow-sm rounded-xl">
                         <CardHeader>
                             <div class="flex items-center gap-2">
-                                <TrendingUp class="w-5 h-5 text-orange-500" />
+                                <TrendingUp class="w-5 h-5 text-primary" />
                                 <CardTitle>Tren Pendapatan Mingguan</CardTitle>
                             </div>
                         </CardHeader>
@@ -228,34 +248,34 @@ const chartOptions = {
                     </Card>
 
                     <!-- Top Items -->
-                    <Card>
+                    <Card class="bg-card text-card-foreground border border-border shadow-sm rounded-xl">
                         <CardHeader>
                             <div class="flex items-center gap-2">
-                                <Trophy class="w-5 h-5 text-yellow-500" />
+                                <Trophy class="w-5 h-5 text-amber-500" />
                                 <CardTitle>5 Menu Terlaris</CardTitle>
                             </div>
                         </CardHeader>
                         <CardContent class="space-y-3">
                             <div v-if="!top_items || top_items.length === 0" class="text-center py-8">
-                                <p class="text-slate-500">Belum ada data</p>
+                                <p class="text-muted-foreground">Belum ada data</p>
                             </div>
                             <div v-for="(item, index) in top_items" :key="item.name"
-                                class="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800">
+                                class="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors">
                                 <Badge variant="outline" :class="{
-                                    'bg-yellow-100 text-yellow-800 border-yellow-300': index === 0,
-                                    'bg-slate-100 text-slate-600 border-slate-300': index > 0,
+                                    'bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800': index === 0,
+                                    'bg-muted text-muted-foreground border-border': index > 0,
                                 }">
                                     #{{ index + 1 }}
                                 </Badge>
                                 <div class="flex-1 min-w-0">
-                                    <p class="font-medium text-slate-900 dark:text-white truncate">
+                                    <p class="font-medium text-foreground truncate">
                                         {{ item.name }}
                                     </p>
-                                    <p class="text-xs text-slate-500">
+                                    <p class="text-xs text-muted-foreground">
                                         {{ item.total_qty }} terjual
                                     </p>
                                 </div>
-                                <p class="text-sm font-medium text-orange-500">
+                                <p class="text-sm font-medium text-primary">
                                     Rp {{ formatPrice(item.total_revenue) }}
                                 </p>
                             </div>
@@ -267,20 +287,22 @@ const chartOptions = {
             <!-- Cashier Dashboard -->
             <template v-else>
                 <div class="flex items-center justify-center min-h-[60vh]">
-                    <Card class="max-w-lg w-full bg-gradient-to-br from-slate-900 to-slate-800 text-white border-0">
+                    <Card
+                        class="max-w-lg w-full bg-card text-card-foreground border border-border shadow-sm rounded-xl">
                         <CardContent class="py-12 text-center">
                             <div
-                                class="w-20 h-20 mx-auto mb-6 bg-orange-500/20 rounded-full flex items-center justify-center">
-                                <Smile class="w-10 h-10 text-orange-400" />
+                                class="w-20 h-20 mx-auto mb-6 bg-primary/10 rounded-full flex items-center justify-center">
+                                <Smile class="w-10 h-10 text-primary" />
                             </div>
-                            <h1 class="text-3xl font-bold mb-2">
-                                Selamat Datang, {{ user?.name }}! 👋
+                            <h1 class="text-3xl font-bold mb-2 text-foreground">
+                                Selamat Datang, <span class="text-primary">{{ user?.name }}</span>! 👋
                             </h1>
-                            <p class="text-slate-300 mb-8 text-lg">
+                            <p class="text-muted-foreground mb-8 text-lg">
                                 Selamat bekerja! Silakan masuk ke menu POS untuk memulai transaksi.
                             </p>
                             <Link :href="route('pos.index')">
-                                <Button size="lg" class="bg-orange-500 hover:bg-orange-600 text-lg px-8 py-6">
+                                <Button size="lg"
+                                    class="bg-primary text-primary-foreground hover:bg-primary/90 text-lg px-8 py-6 shadow-sm border-0">
                                     <Store class="w-6 h-6 mr-3" />
                                     Buka Aplikasi Kasir (POS)
                                 </Button>
