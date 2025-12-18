@@ -28,6 +28,7 @@ class DashboardController extends Controller
                 'stats' => null,
                 'chart' => null,
                 'top_items' => null,
+                'recent_transactions' => null,
             ]);
         }
 
@@ -113,6 +114,11 @@ class DashboardController extends Controller
                 'data' => $dailyRevenue,
             ],
             'top_items' => $topItems,
+            'recent_transactions' => Transaction::with(['user'])
+                ->where('status', 'paid')
+                ->latest()
+                ->limit(5)
+                ->get(),
         ]);
     }
 }
