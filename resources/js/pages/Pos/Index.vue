@@ -2,7 +2,7 @@
 import { ref, computed } from 'vue';
 import { Head, router } from '@inertiajs/vue3';
 import { route } from 'ziggy-js';
-import { Search, Plus, Minus, Trash2, ShoppingCart, ShoppingBag, UtensilsCrossed, Clock, User, CreditCard, ListOrdered, X, RotateCcw } from 'lucide-vue-next';
+import { Search, Plus, Minus, Trash2, ShoppingCart, ShoppingBag, UtensilsCrossed, Clock, User, CreditCard, ListOrdered, X, RotateCcw, ChevronRight } from 'lucide-vue-next';
 import { toast } from 'vue-sonner';
 
 // Layout & Components
@@ -563,26 +563,31 @@ const closeOrderSheet = () => {
                 </main>
             </template>
 
-            <!-- Floating Checkout Bar -->
+            <!-- Floating Checkout Bar (Capsule) -->
             <Transition enter-active-class="transition ease-out duration-300"
                 enter-from-class="translate-y-10 opacity-0" enter-to-class="translate-y-0 opacity-100"
                 leave-active-class="transition ease-in duration-200" leave-from-class="translate-y-0 opacity-100"
                 leave-to-class="translate-y-10 opacity-0">
                 <div v-if="!isCartEmpty || isEditingOrder"
-                    class="fixed bottom-20 left-4 right-4 z-40 bg-orange-500 text-white rounded-xl shadow-lg shadow-orange-500/25 p-4 flex justify-between items-center cursor-pointer active:scale-95 transition-transform"
+                    class="fixed bottom-24 left-1/2 -translate-x-1/2 z-40 w-[90%] md:w-full md:max-w-lg bg-primary text-primary-foreground rounded-full shadow-2xl shadow-primary/40 px-6 py-3 flex justify-between items-center cursor-pointer active:scale-95 transition-transform"
                     @click="isCartOpen = true">
                     <!-- Left Side: Summary -->
-                    <div>
-                        <p class="font-bold text-lg">Rp {{ formatPrice(cartTotal) }}</p>
-                        <p class="text-xs opacity-90">
-                            {{ isEditingOrder ? customerName : `${cartItemsCount} Item` }}
-                        </p>
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+                            <ShoppingBag class="w-5 h-5" />
+                        </div>
+                        <div>
+                            <p class="font-bold text-lg leading-tight">Rp {{ formatPrice(cartTotal) }}</p>
+                            <p class="text-xs opacity-80">
+                                {{ isEditingOrder ? customerName : `${cartItemsCount} Item` }}
+                            </p>
+                        </div>
                     </div>
 
                     <!-- Right Side: Action -->
-                    <div class="flex items-center gap-2 font-semibold">
-                        <span>{{ isEditingOrder ? 'Kelola Pesanan' : 'Lihat Pesanan' }}</span>
-                        <ShoppingBag class="w-5 h-5" />
+                    <div class="flex items-center gap-2 font-semibold text-sm">
+                        <span>{{ isEditingOrder ? 'Kelola' : 'Lihat' }}</span>
+                        <ChevronRight class="w-5 h-5" />
                     </div>
                 </div>
             </Transition>
