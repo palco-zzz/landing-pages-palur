@@ -89,8 +89,13 @@ const dateRange = ref<[Date, Date] | null>([
     parseDate(props.filters.end_date),
 ]);
 
+// Track active preset button
+const activePreset = ref<'today' | 'this_month' | 'last_7_days' | null>('today');
+
 // Helper to apply presets
 const applyPreset = (type: 'today' | 'this_month' | 'last_7_days') => {
+    activePreset.value = type; // Track the active button
+
     const today = new Date();
     let start = new Date();
     let end = new Date();
@@ -238,37 +243,43 @@ const formatPrice = (price: number): string => {
 
             <!-- CONTROL BAR (Filter & Actions) -->
             <div
-                class="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-5 mb-2 flex flex-col md:flex-row justify-between md:items-end gap-4 backdrop-blur-sm">
+                class="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-xl p-6 shadow-sm mb-6 flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
                 <!-- Left: Filter Logic -->
                 <div class="flex flex-col gap-3 w-full md:w-auto">
-                    <div class="flex items-center gap-3">
-                        <Label class="text-zinc-400 text-xs font-medium uppercase tracking-wider">Periode
-                            Laporan</Label>
+                    <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                        <Label class="text-sm font-medium text-gray-500 dark:text-zinc-400">Periode Laporan</Label>
                         <!-- Quick Chips -->
                         <div class="flex gap-2">
-                            <button @click="applyPreset('today')" type="button"
-                                class="text-[10px] px-2 py-1 rounded-md bg-zinc-800 hover:bg-zinc-700 text-zinc-300 transition border border-zinc-700">
+                            <button @click="applyPreset('today')" type="button" :class="[
+                                'px-3 py-1 text-xs font-medium rounded-full border transition-colors cursor-pointer',
+                                activePreset === 'today'
+                                    ? 'bg-amber-100 text-amber-700 border-amber-300 ring-1 ring-amber-200 dark:bg-amber-500/20 dark:text-amber-400 dark:border-amber-500/30'
+                                    : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50 dark:bg-zinc-800 dark:text-zinc-300 dark:border-zinc-700 dark:hover:bg-zinc-700'
+                            ]">
                                 Hari Ini
                             </button>
-                            <button @click="applyPreset('this_month')" type="button"
-                                class="text-[10px] px-2 py-1 rounded-md bg-zinc-800 hover:bg-zinc-700 text-zinc-300 transition border border-zinc-700">
+                            <button @click="applyPreset('this_month')" type="button" :class="[
+                                'px-3 py-1 text-xs font-medium rounded-full border transition-colors cursor-pointer',
+                                activePreset === 'this_month'
+                                    ? 'bg-amber-100 text-amber-700 border-amber-300 ring-1 ring-amber-200 dark:bg-amber-500/20 dark:text-amber-400 dark:border-amber-500/30'
+                                    : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50 dark:bg-zinc-800 dark:text-zinc-300 dark:border-zinc-700 dark:hover:bg-zinc-700'
+                            ]">
                                 Bulan Ini
                             </button>
                         </div>
                     </div>
 
                     <!-- Date Picker -->
-                    <VueDatePicker v-model="dateRange" range :dark="true" format="dd MMM yyyy"
-                        :enable-time-picker="false" :auto-apply="true" :close-on-auto-apply="true"
-                        menu-class-name="!bg-zinc-900 !border-zinc-800 !rounded-xl"
-                        calendar-cell-class-name="hover:!bg-orange-500/20 rounded-full" :style="{ minWidth: '260px' }">
+                    <VueDatePicker v-model="dateRange" range format="dd MMM yyyy" :enable-time-picker="false"
+                        :auto-apply="true" :close-on-auto-apply="true" :style="{ minWidth: '260px' }">
                         <template #trigger>
                             <div
-                                class="bg-black/40 border border-zinc-700 hover:border-orange-500/50 text-white rounded-xl px-4 py-2.5 flex items-center justify-between gap-3 cursor-pointer transition group w-full md:w-[280px]">
-                                <span class="text-sm font-medium text-zinc-200">
+                                class="bg-white dark:bg-black/40 border border-gray-300 dark:border-zinc-700 hover:border-amber-500 text-gray-900 dark:text-white rounded-lg px-4 py-2.5 flex items-center justify-between gap-3 cursor-pointer transition group w-full md:w-[280px]">
+                                <span class="text-sm font-medium text-gray-700 dark:text-zinc-200">
                                     {{ dateRange ? formatDateTrigger(dateRange) : 'Pilih Rentang Tanggal' }}
                                 </span>
-                                <Calendar class="w-4 h-4 text-zinc-500 group-hover:text-orange-500 transition-colors" />
+                                <Calendar
+                                    class="w-4 h-4 text-gray-400 dark:text-zinc-500 group-hover:text-amber-500 transition-colors" />
                             </div>
                         </template>
                     </VueDatePicker>
@@ -276,16 +287,16 @@ const formatPrice = (price: number): string => {
 
                 <!-- Right: Actions -->
                 <div class="flex flex-row gap-3 w-full md:w-auto">
-                    <Button @click="exportPdf" variant="outline"
-                        class="flex-1 md:flex-none bg-red-500/10 text-red-500 border-red-500/20 hover:bg-red-500 hover:text-white hover:border-red-500 transition-all rounded-xl">
-                        <Download class="w-4 h-4 mr-2" />
+                    <button @click="exportPdf" type="button"
+                        class="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2.5 bg-red-50 text-red-700 border border-red-200 rounded-lg hover:bg-red-100 font-medium transition-colors dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20 dark:hover:bg-red-500/20">
+                        <Download class="w-4 h-4" />
                         PDF
-                    </Button>
-                    <Button @click="exportExcel" variant="outline"
-                        class="flex-1 md:flex-none bg-emerald-500/10 text-emerald-500 border-emerald-500/20 hover:bg-emerald-500 hover:text-white hover:border-emerald-500 transition-all rounded-xl">
-                        <FileSpreadsheet class="w-4 h-4 mr-2" />
+                    </button>
+                    <button @click="exportExcel" type="button"
+                        class="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg hover:bg-emerald-100 font-medium transition-colors dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20 dark:hover:bg-emerald-500/20">
+                        <FileSpreadsheet class="w-4 h-4" />
                         Excel
-                    </Button>
+                    </button>
                 </div>
             </div>
 

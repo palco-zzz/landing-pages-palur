@@ -34,12 +34,12 @@ const submit = () => {
             <!-- Branding Content -->
             <div class="relative z-10 text-center px-8 py-12 lg:py-0">
                 <!-- Logo -->
-                <img src="/images/logo-bakmi-palur.png" alt="Bakmi Jowo Palur"
+                <img src="/images/logo-bakmi-palur.png" alt="Mie Lethek Palur"
                     class="w-32 h-32 lg:w-48 lg:h-48 mx-auto mb-6 object-contain" />
 
                 <!-- Brand Name -->
                 <h1 class="text-2xl lg:text-4xl font-bold text-white mb-3">
-                    Bakmi Jowo Palur
+                    Mie Lethek Palur
                 </h1>
 
                 <!-- Tagline -->
@@ -132,7 +132,7 @@ const submit = () => {
 
                 <!-- Footer -->
                 <p class="mt-8 text-center text-xs text-zinc-500">
-                    © {{ new Date().getFullYear() }} Bakmi Jowo Palur. All rights reserved.
+                    © {{ new Date().getFullYear() }} Mie Lethek Palur. All rights reserved.
                 </p>
             </div>
         </div>

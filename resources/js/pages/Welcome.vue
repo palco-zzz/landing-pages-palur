@@ -187,7 +187,7 @@ const closeModal = () => {
 };
 
 const getWhatsAppUrl = (title: string) => {
-    const message = `Halo Admin Bakmi Jowo Palur, saya mau pesan ${title}. Apakah tersedia?`;
+    const message = `Halo Admin Mie Lethek Palur, saya mau pesan ${title}. Apakah tersedia?`;
     return `https://wa.me/6289652431182?text=${encodeURIComponent(message)}`;
 };
 
@@ -214,7 +214,7 @@ const scrollTo = (id: string) => {
             <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
                 <!-- Logo -->
                 <a href="#" class="text-lg font-medium tracking-tighter text-white flex items-center gap-2"
-                    aria-label="Bakmi Jowo Palur Home">
+                    aria-label="Mie Lethek Palur Home">
                     <UtensilsCrossed class="w-5 h-5 text-amber-500" />
                     PALUR.
                 </a>
@@ -331,7 +331,7 @@ const scrollTo = (id: string) => {
                         <div
                             class="mt-8 w-full h-48 rounded-xl bg-zinc-900 overflow-hidden border border-white/5 relative">
                             <img src="https://images.unsplash.com/photo-1552611052-33e04de081de?q=80&w=1600&auto=format&fit=crop"
-                                alt="Suasana Makan Bakmi Jowo Palur"
+                                alt="Suasana Makan Mie Lethek Palur"
                                 class="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-700">
                         </div>
                     </div>
@@ -513,7 +513,7 @@ const scrollTo = (id: string) => {
                         class="h-[400px] w-full rounded-3xl overflow-hidden border border-white/10 relative group bg-zinc-900">
                         <iframe
                             src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3955.031525997677!2d110.85249157499709!3d-7.5715783924424365!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e7a16fbd9d0c24b%3A0x6b484501a37c35e!2sPalur%20Plaza!5e0!3m2!1sen!2sid!4v1709623849123!5m2!1sen!2sid"
-                            title="Lokasi Bakmi Jowo Palur" width="100%" height="100%" style="border:0;"
+                            title="Lokasi Mie Lethek Palur" width="100%" height="100%" style="border:0;"
                             allowfullscreen="true" loading="lazy"
                             class="opacity-60 group-hover:opacity-100 transition-opacity duration-500 invert-[.9] grayscale contrast-[.85]"></iframe>
                         <div class="absolute inset-0 pointer-events-none border border-white/5 rounded-3xl z-10"></div>
@@ -524,7 +524,7 @@ const scrollTo = (id: string) => {
                 <div
                     class="mt-20 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
                     <p class="text-xs text-zinc-500">
-                        © 2024 Bakmi Jowo & Mie Lethek Palur. All rights reserved.
+                        © 2024 Mie Lethek Palur. All rights reserved.
                     </p>
                     <div class="flex gap-4">
                         <a href="#" class="text-zinc-500 hover:text-white transition-colors" aria-label="Instagram">

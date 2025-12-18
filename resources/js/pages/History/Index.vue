@@ -226,7 +226,7 @@ const reprintReceipt = (transaction: Transaction) => {
         type: 'customer',
         title: 'STRUK PEMBAYARAN',
         subtitle: '(CETAK ULANG)',
-        store_name: 'Bakmi Jowo Palur',
+        store_name: 'Mie Lethek Palur',
         date: formatDateTime(transaction.created_at),
         cashier: transaction.user?.name || 'Kasir',
         customer_name: transaction.customer_name,
@@ -265,64 +265,56 @@ const goToPage = (url: string | null) => {
             </div>
 
             <!-- Smart Filter Bar -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6 p-4 bg-zinc-100 dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-700">
+            <div
+                class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6 p-4 bg-zinc-100 dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-700">
                 <!-- Preset Dropdown -->
                 <div class="relative">
-                    <label class="block text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1.5">Filter Cepat</label>
+                    <label class="block text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1.5">Filter
+                        Cepat</label>
                     <div class="relative">
-                        <select
-                            v-model="presetFilter"
-                            class="w-full h-10 pl-3 pr-10 bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-600 rounded-lg text-sm text-zinc-900 dark:text-zinc-100 appearance-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
-                        >
+                        <select v-model="presetFilter"
+                            class="w-full h-10 pl-3 pr-10 bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-600 rounded-lg text-sm text-zinc-900 dark:text-zinc-100 appearance-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors">
                             <option value="hari_ini">Hari Ini</option>
                             <option value="kemarin">Kemarin</option>
                             <option value="7_hari">7 Hari Terakhir</option>
                             <option value="bulan_ini">Bulan Ini</option>
                             <option value="custom">Custom</option>
                         </select>
-                        <ChevronDown class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 pointer-events-none" />
+                        <ChevronDown
+                            class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 pointer-events-none" />
                     </div>
                 </div>
 
                 <!-- Start Date -->
                 <div class="relative">
-                    <label class="block text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1.5">Dari Tanggal</label>
+                    <label class="block text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1.5">Dari
+                        Tanggal</label>
                     <div class="relative">
                         <Calendar class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
-                        <input
-                            v-model="startDate"
-                            type="date"
-                            :disabled="presetFilter !== 'custom'"
-                            class="w-full h-10 pl-10 pr-3 bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-600 rounded-lg text-sm text-zinc-900 dark:text-zinc-100 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-                        />
+                        <input v-model="startDate" type="date" :disabled="presetFilter !== 'custom'"
+                            class="w-full h-10 pl-10 pr-3 bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-600 rounded-lg text-sm text-zinc-900 dark:text-zinc-100 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors disabled:opacity-60 disabled:cursor-not-allowed" />
                     </div>
                 </div>
 
                 <!-- End Date -->
                 <div class="relative">
-                    <label class="block text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1.5">Sampai Tanggal</label>
+                    <label class="block text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1.5">Sampai
+                        Tanggal</label>
                     <div class="relative">
                         <Calendar class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
-                        <input
-                            v-model="endDate"
-                            type="date"
-                            :disabled="presetFilter !== 'custom'"
-                            class="w-full h-10 pl-10 pr-3 bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-600 rounded-lg text-sm text-zinc-900 dark:text-zinc-100 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-                        />
+                        <input v-model="endDate" type="date" :disabled="presetFilter !== 'custom'"
+                            class="w-full h-10 pl-10 pr-3 bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-600 rounded-lg text-sm text-zinc-900 dark:text-zinc-100 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors disabled:opacity-60 disabled:cursor-not-allowed" />
                     </div>
                 </div>
 
                 <!-- Search Input -->
                 <div class="relative">
-                    <label class="block text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1.5">Cari Pelanggan</label>
+                    <label class="block text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1.5">Cari
+                        Pelanggan</label>
                     <div class="relative">
                         <Search class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
-                        <input
-                            v-model="searchFilter"
-                            type="text"
-                            placeholder="Nama pelanggan..."
-                            class="w-full h-10 pl-10 pr-3 bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-600 rounded-lg text-sm text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
-                        />
+                        <input v-model="searchFilter" type="text" placeholder="Nama pelanggan..."
+                            class="w-full h-10 pl-10 pr-3 bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-600 rounded-lg text-sm text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors" />
                     </div>
                 </div>
             </div>

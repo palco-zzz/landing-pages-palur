@@ -11,6 +11,7 @@ import {
     Menu as MenuIcon,
     Users,
     Tags,
+    UtensilsCrossed,
     LogOut,
     Settings,
     ChevronRight,
@@ -117,6 +118,17 @@ const handleSheetClose = () => {
                                     <Tags class="w-5 h-5" />
                                 </div>
                                 <span class="font-medium">Kategori Menu</span>
+                            </div>
+                            <ChevronRight class="w-4 h-4 text-zinc-600" />
+                        </Link>
+
+                        <Link :href="getRoute('menus.index')" @click="handleSheetClose"
+                            class="flex items-center justify-between p-3 rounded-xl hover:bg-zinc-900 active:bg-zinc-800 transition-colors text-zinc-200">
+                            <div class="flex items-center gap-3">
+                                <div class="p-2 rounded-lg bg-orange-500/10 text-orange-500">
+                                    <UtensilsCrossed class="w-5 h-5" />
+                                </div>
+                                <span class="font-medium">Daftar Menu</span>
                             </div>
                             <ChevronRight class="w-4 h-4 text-zinc-600" />
                         </Link>
