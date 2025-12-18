@@ -270,14 +270,17 @@ const formatPrice = (price: number): string => {
                     </div>
 
                     <!-- Date Picker -->
-                    <VueDatePicker v-model="dateRange" range format="dd MMM yyyy" :enable-time-picker="false"
-                        :auto-apply="true" :close-on-auto-apply="true" :style="{ minWidth: '260px' }">
+                    <VueDatePicker v-model="dateRange" range :auto-apply="true" :close-on-auto-apply="true"
+                        :enable-time-picker="false" :teleport="true" format="dd MMM yyyy" :dark="false"
+                        class="w-full md:w-auto">
                         <template #trigger>
                             <div
-                                class="bg-white dark:bg-black/40 border border-gray-300 dark:border-zinc-700 hover:border-amber-500 text-gray-900 dark:text-white rounded-lg px-4 py-2.5 flex items-center justify-between gap-3 cursor-pointer transition group w-full md:w-[280px]">
-                                <span class="text-sm font-medium text-gray-700 dark:text-zinc-200">
-                                    {{ dateRange ? formatDateTrigger(dateRange) : 'Pilih Rentang Tanggal' }}
+                                class="flex items-center justify-between w-full md:w-[280px] px-4 py-2.5 bg-white dark:bg-black/40 border border-gray-200 dark:border-zinc-700 rounded-lg cursor-pointer hover:border-amber-400 dark:hover:border-amber-500 transition-colors group">
+                                <span v-if="dateRange && dateRange[0] && dateRange[1]"
+                                    class="text-sm font-medium text-gray-700 dark:text-zinc-200">
+                                    {{ formatDateTrigger(dateRange) }}
                                 </span>
+                                <span v-else class="text-sm text-gray-400 dark:text-zinc-500">Pilih Periode...</span>
                                 <Calendar
                                     class="w-4 h-4 text-gray-400 dark:text-zinc-500 group-hover:text-amber-500 transition-colors" />
                             </div>

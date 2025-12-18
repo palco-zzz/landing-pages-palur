@@ -416,19 +416,24 @@ const closeOrderSheet = () => {
                     </Button>
                 </div>
 
-                <!-- Editing Order Indicator -->
+                <!-- Active Customer Session Bar -->
                 <div v-if="isEditingOrder"
-                    class="mt-2 px-3 py-2 bg-orange-100 dark:bg-orange-950 rounded-lg flex items-center justify-between">
-                    <div class="flex items-center gap-2">
-                        <User class="w-4 h-4 text-orange-600" />
-                        <span class="text-sm font-medium text-orange-700 dark:text-orange-300">
-                            {{ customerName }}
-                        </span>
+                    class="mt-3 bg-white dark:bg-slate-900 border border-dashed border-gray-300 dark:border-slate-700 rounded-xl p-3 flex justify-between items-center shadow-sm">
+                    <div class="flex items-center">
+                        <div class="bg-gray-100 dark:bg-slate-800 p-2 rounded-full">
+                            <User class="w-5 h-5 text-gray-600 dark:text-slate-400" />
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-[10px] uppercase tracking-wide text-gray-500 dark:text-slate-500">Pelanggan
+                            </p>
+                            <p class="font-semibold text-gray-800 dark:text-white">{{ customerName }}</p>
+                        </div>
                     </div>
-                    <Button variant="ghost" size="sm" class="text-orange-600 hover:text-orange-700 h-7 px-2"
-                        @click="clearCart">
-                        Batal
-                    </Button>
+                    <button @click="clearCart"
+                        class="flex items-center gap-2 px-4 py-2 bg-red-50 dark:bg-red-950 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-100 dark:hover:bg-red-900 border border-red-100 dark:border-red-900 transition-colors cursor-pointer">
+                        <X class="w-4 h-4" />
+                        <span class="font-medium text-sm">Batal</span>
+                    </button>
                 </div>
             </div>
 
@@ -468,39 +473,43 @@ const closeOrderSheet = () => {
                         <p class="text-sm text-slate-500">Coba ubah kata kunci pencarian</p>
                     </div>
 
-                    <div v-else class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                        <Card v-for="menu in filteredMenus" :key="menu.id"
-                            class="overflow-hidden border-slate-200 dark:border-slate-800 hover:shadow-md transition-shadow">
-                            <div class="aspect-video bg-slate-200 dark:bg-slate-800 relative overflow-hidden">
+                    <div v-else class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                        <div v-for="menu in filteredMenus" :key="menu.id"
+                            class="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden flex flex-col group relative">
+                            <!-- Image Area -->
+                            <div
+                                class="aspect-[4/3] bg-gray-50 dark:bg-slate-800 relative flex items-center justify-center overflow-hidden">
                                 <img v-if="menu.image" :src="menu.image" :alt="menu.name"
-                                    class="w-full h-full object-cover" />
-                                <div v-else class="w-full h-full flex items-center justify-center">
-                                    <UtensilsCrossed class="w-8 h-8 text-slate-400" />
-                                </div>
+                                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                                <UtensilsCrossed v-else class="w-12 h-12 text-gray-300 dark:text-slate-600" />
 
+                                <!-- Cart Quantity Badge -->
                                 <div v-if="getCartQuantity(menu.id) > 0"
-                                    class="absolute top-2 right-2 w-6 h-6 rounded-full bg-orange-500 text-white text-xs font-bold flex items-center justify-center shadow-lg">
+                                    class="absolute top-2 right-2 w-7 h-7 rounded-full bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center shadow-lg">
                                     {{ getCartQuantity(menu.id) }}
                                 </div>
                             </div>
 
-                            <CardContent class="p-3">
-                                <h3 class="font-medium text-sm text-slate-900 dark:text-white line-clamp-2 mb-1">
+                            <!-- Content Area -->
+                            <div class="p-4 flex flex-col gap-2 flex-1">
+                                <h3
+                                    class="font-semibold text-gray-800 dark:text-white line-clamp-1 group-hover:text-primary transition-colors">
                                     {{ menu.name }}
                                 </h3>
-                                <p class="text-sm font-semibold text-orange-600 dark:text-orange-400">
+                                <p class="font-bold text-lg text-primary">
                                     Rp {{ formatPrice(menu.price) }}
                                 </p>
-                            </CardContent>
+                            </div>
 
-                            <CardFooter class="p-3 pt-0">
-                                <Button size="sm" class="w-full bg-orange-500 hover:bg-orange-600 text-white"
-                                    @click="addToCart(menu)">
-                                    <Plus class="w-4 h-4 mr-1" />
+                            <!-- Add Button -->
+                            <div class="p-4 pt-0">
+                                <button @click="addToCart(menu)"
+                                    class="w-full py-2.5 rounded-xl bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-400 font-bold text-sm hover:bg-amber-500 hover:text-white dark:hover:bg-amber-600 transition-all duration-300 flex items-center justify-center gap-2">
+                                    <Plus class="w-4 h-4" />
                                     Tambah
-                                </Button>
-                            </CardFooter>
-                        </Card>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </main>
             </template>
