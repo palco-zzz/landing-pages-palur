@@ -140,6 +140,11 @@ const isCartEmpty = computed(() => cart.value.length === 0);
 
 const isEditingOrder = computed(() => selectedTransaction.value !== null);
 
+// Check if we're editing an order that has no items (all items voided)
+const isEmptyEditingOrder = computed(() =>
+    isEditingOrder.value && existingItemsOnly.value.length === 0 && newItemsOnly.value.length === 0
+);
+
 // Methods
 const formatPrice = (price: number): string => {
     return new Intl.NumberFormat('id-ID').format(price);
@@ -293,6 +298,38 @@ const addMoreItems = () => {
     // selectedTransaction and cart remain active, so user can add more
     toast.info('Tambah Menu', {
         description: `Pilih menu untuk ditambahkan ke pesanan ${customerName.value}.`,
+    });
+};
+
+// Cancel/Void entire empty transaction
+const cancelTransaction = () => {
+    if (!selectedTransaction.value) return;
+
+    if (!confirm('Yakin ingin membatalkan transaksi ini secara permanen? Tindakan ini tidak dapat dibatalkan.')) {
+        return;
+    }
+
+    isProcessing.value = true;
+
+    router.post(route('pos.orders.cancel', { transaction: selectedTransaction.value.id }), {}, {
+        preserveScroll: true,
+        preserveState: false,
+        onSuccess: () => {
+            toast.success('Transaksi Dibatalkan', {
+                description: `Pesanan ${customerName.value} telah dibatalkan.`,
+            });
+            clearCart();
+            isCartOpen.value = false;
+        },
+        onError: (errors) => {
+            console.error('Cancel transaction failed:', errors);
+            toast.error('Gagal Membatalkan', {
+                description: 'Terjadi kesalahan saat membatalkan transaksi.',
+            });
+        },
+        onFinish: () => {
+            isProcessing.value = false;
+        },
     });
 };
 
@@ -651,6 +688,32 @@ const closeOrderSheet = () => {
                                         </p>
                                     </div>
 
+                                    <!-- Empty State for Editing Orders (All Items Voided) -->
+                                    <div v-else-if="isEmptyEditingOrder"
+                                        class="flex flex-col items-center justify-center h-64 text-center space-y-4">
+                                        <div class="w-16 h-16 rounded-full bg-muted flex items-center justify-center">
+                                            <ShoppingBag class="w-8 h-8 text-muted-foreground/30" />
+                                        </div>
+                                        <div>
+                                            <h3 class="font-medium text-foreground mb-1">Pesanan Kosong</h3>
+                                            <p class="text-sm text-muted-foreground">Belum ada menu di pesanan ini.</p>
+                                        </div>
+
+                                        <!-- Action Buttons for Empty Order -->
+                                        <div class="w-full space-y-2 px-4">
+                                            <button @click="addMoreItems"
+                                                class="w-full py-3 rounded-xl bg-primary text-primary-foreground shadow-lg font-bold flex items-center justify-center gap-2 active:scale-95 transition">
+                                                <Plus class="w-5 h-5" />
+                                                Tambah Menu
+                                            </button>
+                                            <button @click="cancelTransaction" :disabled="isProcessing"
+                                                class="w-full py-3 rounded-xl bg-red-50 dark:bg-red-950 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 hover:bg-red-100 dark:hover:bg-red-900 font-bold flex items-center justify-center gap-2 transition disabled:opacity-50">
+                                                <Trash2 class="w-5 h-5" />
+                                                Batalkan Transaksi
+                                            </button>
+                                        </div>
+                                    </div>
+
                                     <!-- Existing Items (with staged deletion) -->
                                     <template v-if="existingItemsOnly.length > 0">
                                         <div
@@ -807,8 +870,8 @@ const closeOrderSheet = () => {
                                                 Simpan Tambahan
                                             </Button>
 
-                                            <!-- Checkout Button (always visible when editing) -->
-                                            <Button
+                                            <!-- Checkout Button (only if not empty) -->
+                                            <Button v-if="!isEmptyEditingOrder"
                                                 class="w-full py-3 rounded-xl font-bold bg-green-600 hover:bg-green-700 text-white active:scale-95 transition"
                                                 :disabled="isProcessing || hasNewItems || itemsToDelete.length > 0"
                                                 @click="openCheckout">
