@@ -4,7 +4,6 @@ import { Link, usePage } from '@inertiajs/vue3';
 import { route } from 'ziggy-js';
 import {
     LayoutGrid,
-    UtensilsCrossed,
     Store,
     ChartPie,
     User,
@@ -55,12 +54,12 @@ const handleSheetClose = () => {
                 <span class="text-[10px] font-medium mt-1">Dashboard</span>
             </Link>
 
-            <Link :href="getRoute('menus.index')"
+            <Link :href="getRoute('history.index')"
                 class="flex flex-col items-center justify-center gap-1 transition-colors hover:text-zinc-300 w-full"
-                :class="route().current('menus.*') ? 'text-orange-500' : 'text-zinc-500'">
-                <UtensilsCrossed class="w-6 h-6 transition-transform active:scale-95"
-                    :class="route().current('menus.*') ? 'stroke-[2.5]' : 'stroke-2'" />
-                <span class="text-[10px] font-medium mt-1">Produk</span>
+                :class="route().current('history.*') ? 'text-orange-500' : 'text-zinc-500'">
+                <History class="w-6 h-6 transition-transform active:scale-95"
+                    :class="route().current('history.*') ? 'stroke-[2.5]' : 'stroke-2'" />
+                <span class="text-[10px] font-medium mt-1">Riwayat</span>
             </Link>
 
             <!-- POS BUTTON -->
