@@ -44,7 +44,7 @@ const handleSheetClose = () => {
 
 <template>
     <nav
-        class="fixed bottom-0 left-0 right-0 z-[100] h-20 pb-safe bg-zinc-950/80 backdrop-blur-xl border-t border-white/5 flex justify-between items-center px-6 shadow-[0_-5px_20px_rgba(0,0,0,0.3)] md:hidden">
+        class="fixed bottom-0 left-0 right-0 z-[100] h-20 pb-safe bg-zinc-950 border-t border-zinc-800 flex justify-between items-center px-6 shadow-lg md:hidden">
         <!-- ADMIN NAVIGATION -->
         <template v-if="isAdmin">
             <Link :href="getRoute('dashboard')"
