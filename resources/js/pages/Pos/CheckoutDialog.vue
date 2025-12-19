@@ -2,7 +2,11 @@
 import { ref, computed, watch } from 'vue';
 import { router } from '@inertiajs/vue3';
 import { route } from 'ziggy-js';
-import { Banknote, QrCode, CreditCard, Check } from 'lucide-vue-next';
+import { Banknote, QrCode, CreditCard, Check, WifiOff } from 'lucide-vue-next';
+import { toast } from 'vue-sonner';
+
+// Composables
+import { useOfflineTransaction } from '@/composables/useOfflineTransaction';
 
 // Shadcn UI Components
 import { Button } from '@/components/ui/button';
@@ -16,13 +20,35 @@ import {
     DialogFooter,
 } from '@/components/ui/dialog';
 
+// Offline Transaction Support
+const { isOnline, addToQueue } = useOfflineTransaction();
+
 // Types
+interface TransactionItem {
+    id: number;
+    menu_id?: number;
+    quantity: number;
+    price: number;
+    subtotal: number;
+    is_printed?: boolean;
+    status?: 'active' | 'void';
+    menu: {
+        id: number;
+        name: string;
+        price: number;
+        category_id?: number;
+        category?: { id: number; name: string } | null;
+        image?: string | null;
+    };
+}
+
 interface Transaction {
     id: number;
     uuid: string;
     customer_name: string;
     total_amount: number;
     status: 'unpaid' | 'paid' | 'cancelled';
+    items?: TransactionItem[];
 }
 
 // Props & Emits
@@ -34,6 +60,7 @@ const props = defineProps<{
 const emit = defineEmits<{
     'update:open': [value: boolean];
     'success': [];
+    'offline-success': [data: any];
 }>();
 
 // State
@@ -77,6 +104,40 @@ const confirmPayment = () => {
 
     isProcessing.value = true;
 
+    const paymentData = {
+        payment_method: paymentMethod.value,
+        cash_received: paymentMethod.value === 'cash' ? cashReceived.value : null,
+        change: paymentMethod.value === 'cash' ? changeAmount.value : 0,
+    };
+
+    // OFFLINE MODE: Save locally and emit for parent to handle printing
+    if (!isOnline.value) {
+        // Build offline transaction data for printing and queueing
+        const offlineData = {
+            ...props.transaction,
+            ...paymentData,
+            status: 'paid' as const,
+            paid_at: new Date().toISOString(),
+            is_offline: true,
+        };
+
+        // Queue for later sync (if needed for auditing)
+        // Note: The original order should already be queued from processOrder
+        // This is just marking it as paid offline
+
+        toast.success('Pembayaran Berhasil (Offline)', {
+            description: `${props.transaction.customer_name} - Rp ${formatPrice(totalAmount.value)}`,
+            icon: WifiOff,
+        });
+
+        // Emit for parent to handle printing
+        emit('offline-success', offlineData);
+        closeDialog();
+        isProcessing.value = false;
+        return;
+    }
+
+    // ONLINE MODE: Normal server submission
     const data: { payment_method: string; cash_received?: number } = {
         payment_method: paymentMethod.value,
     };

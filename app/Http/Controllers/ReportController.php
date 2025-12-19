@@ -31,9 +31,13 @@ class ReportController extends Controller
             : Carbon::now()->endOfMonth();
 
         // Query 1: Hourly Transaction Trend (0-23 hours)
+        // Convert UTC to Jakarta time (UTC+7) before extracting hour
         $hourlyData = Transaction::where('status', 'paid')
             ->whereBetween('created_at', [$startDate, $endDate])
-            ->select(DB::raw('HOUR(created_at) as hour'), DB::raw('COUNT(*) as count'))
+            ->select(
+                DB::raw('HOUR(ADDTIME(created_at, \'07:00:00\')) as hour'),
+                DB::raw('COUNT(*) as count')
+            )
             ->groupBy('hour')
             ->pluck('count', 'hour')
             ->toArray();

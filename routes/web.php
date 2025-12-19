@@ -26,6 +26,7 @@ Route::get('dashboard', [DashboardController::class, 'index'])
 Route::middleware(['auth', 'verified'])->prefix('pos')->name('pos.')->group(function () {
     Route::get('/', [PosController::class, 'index'])->name('index');
     Route::post('/orders', [PosController::class, 'store'])->name('orders.store');
+    Route::post('/sync', [PosController::class, 'sync'])->name('sync');
     Route::get('/unpaid', [PosController::class, 'unpaidOrders'])->name('unpaid');
     Route::post('/orders/{transaction}/add', [PosController::class, 'addItem'])->name('orders.add');
     Route::post('/orders/{transaction}/checkout', [PosController::class, 'checkout'])->name('orders.checkout');

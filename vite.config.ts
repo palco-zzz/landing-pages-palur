@@ -28,9 +28,9 @@ export default defineConfig({
             registerType: 'autoUpdate',
             includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
             manifest: {
-                name: 'Bakmi Jowo Palur POS',
+                name: 'Mie Lethek Palur POS',
                 short_name: 'POS Palur',
-                description: 'Sistem Kasir Bakmi Jowo Palur',
+                description: 'Sistem Kasir Mie Lethek Palur',
                 theme_color: '#09090b',
                 background_color: '#09090b',
                 display: 'standalone',

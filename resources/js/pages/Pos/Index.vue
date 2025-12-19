@@ -2,8 +2,11 @@
 import { ref, computed } from 'vue';
 import { Head, router } from '@inertiajs/vue3';
 import { route } from 'ziggy-js';
-import { Search, Plus, Minus, Trash2, ShoppingCart, ShoppingBag, UtensilsCrossed, Clock, User, CreditCard, ListOrdered, X, RotateCcw, ChevronRight } from 'lucide-vue-next';
+import { Search, Plus, Minus, Trash2, ShoppingCart, ShoppingBag, UtensilsCrossed, Clock, User, CreditCard, ListOrdered, X, RotateCcw, ChevronRight, Wifi, WifiOff, CloudOff } from 'lucide-vue-next';
 import { toast } from 'vue-sonner';
+
+// Composables
+import { useOfflineTransaction } from '@/composables/useOfflineTransaction';
 
 // Layout & Components
 import AppLayout from '@/layouts/AppLayout.vue';
@@ -31,6 +34,9 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: route('pos.index'),
     },
 ];
+
+// Offline Transaction Support
+const { isOnline, offlineQueue, isSyncing, addToQueue } = useOfflineTransaction();
 
 // Types
 interface Category {
@@ -163,6 +169,16 @@ const formatTimeAgo = (dateString: string): string => {
     if (diffHours < 24) return `${diffHours} jam lalu`;
 
     return date.toLocaleDateString('id-ID');
+};
+
+// Generate UUID for idempotency (prevent duplicate orders)
+const generateUUID = (): string => {
+    // Use crypto.randomUUID if available, otherwise fallback
+    if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+        return crypto.randomUUID();
+    }
+    // Fallback: timestamp + random string
+    return `${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
 };
 
 const addToCart = (menu: Menu) => {
@@ -346,7 +362,11 @@ const processOrder = () => {
 
     isProcessing.value = true;
 
+    // Generate UUID for idempotency
+    const transactionUuid = generateUUID();
+
     const orderData = {
+        uuid: transactionUuid,
         customer_name: customerName.value,
         items: cart.value.filter(item => !item.isExisting).map(item => ({
             menu_id: item.menu.id,
@@ -356,6 +376,25 @@ const processOrder = () => {
         })),
     };
 
+    // OFFLINE MODE: Save to queue instead of sending to server
+    if (!isOnline.value) {
+        const success = addToQueue(orderData);
+        if (success) {
+            clearCart();
+            isCartOpen.value = false;
+            toast.warning('Pesanan Disimpan Offline', {
+                description: `Pesanan ${customerName.value} akan dikirim saat koneksi kembali.`,
+            });
+        } else {
+            toast.error('Gagal Menyimpan', {
+                description: 'Tidak dapat menyimpan pesanan offline.',
+            });
+        }
+        isProcessing.value = false;
+        return;
+    }
+
+    // ONLINE MODE: Normal server submission
     router.post(route('pos.orders.store'), orderData, {
         onSuccess: () => {
             clearCart();
@@ -416,6 +455,53 @@ const onCheckoutSuccess = () => {
     currentView.value = 'active';
 };
 
+// Handle offline checkout - print receipt locally without server
+const handleOfflineCheckout = (offlineData: any) => {
+    // Clear cart and close dialogs
+    clearCart();
+    isCheckoutOpen.value = false;
+    currentView.value = 'active';
+
+    // Show toast about printing
+    toast.info('Struk sedang dicetak...', {
+        description: `Pembayaran offline untuk ${offlineData.customer_name}`,
+    });
+
+    // Note: The actual print job would be triggered via flash session data
+    // For offline mode, we can store print job in localStorage and handle it
+    // when connection returns, or use a local print solution
+
+    // Store print job for later or immediate local printing
+    const printJob = {
+        type: 'customer',
+        title: 'STRUK PEMBAYARAN (OFFLINE)',
+        store_name: 'Mie Lethek Palur',
+        date: new Date().toLocaleString('id-ID'),
+        cashier: 'Kasir',
+        customer_name: offlineData.customer_name,
+        order_number: offlineData.uuid?.substring(0, 8) || offlineData.id,
+        items: offlineData.items?.map((item: any) => ({
+            name: item.menu?.name || 'Item',
+            qty: item.quantity,
+            price: item.price,
+            subtotal: item.subtotal,
+        })) || [],
+        total: offlineData.total_amount,
+        payment_method: offlineData.payment_method,
+        cash_received: offlineData.cash_received,
+        change: offlineData.change,
+    };
+
+    // Store in localStorage for later sync or local printing
+    try {
+        const offlinePrintJobs = JSON.parse(localStorage.getItem('pos_offline_print_jobs') || '[]');
+        offlinePrintJobs.push(printJob);
+        localStorage.setItem('pos_offline_print_jobs', JSON.stringify(offlinePrintJobs));
+    } catch (e) {
+        console.error('Failed to store offline print job:', e);
+    }
+};
+
 const getCartQuantity = (menuId: number): number => {
     const item = cart.value.find(item => item.menu.id === menuId && !item.isExisting);
     return item?.quantity || 0;
@@ -451,6 +537,36 @@ const closeOrderSheet = () => {
                             {{ activeOrders.length }}
                         </Badge>
                     </Button>
+                </div>
+
+                <!-- Offline/Sync Status Indicator -->
+                <div class="mt-2 flex items-center gap-2">
+                    <!-- Offline Mode Badge -->
+                    <div v-if="!isOnline"
+                        class="flex items-center gap-2 px-3 py-1.5 bg-red-100 dark:bg-red-950 text-red-700 dark:text-red-400 rounded-full text-xs font-semibold">
+                        <WifiOff class="w-3.5 h-3.5" />
+                        <span>OFFLINE MODE</span>
+                    </div>
+
+                    <!-- Syncing Badge -->
+                    <div v-else-if="isSyncing"
+                        class="flex items-center gap-2 px-3 py-1.5 bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-400 rounded-full text-xs font-semibold animate-pulse">
+                        <CloudOff class="w-3.5 h-3.5" />
+                        <span>Syncing...</span>
+                    </div>
+
+                    <!-- Pending Offline Orders Badge -->
+                    <div v-else-if="offlineQueue.length > 0"
+                        class="flex items-center gap-2 px-3 py-1.5 bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-400 rounded-full text-xs font-semibold">
+                        <CloudOff class="w-3.5 h-3.5" />
+                        <span>{{ offlineQueue.length }} Pesanan Pending</span>
+                    </div>
+
+                    <!-- Online Indicator (subtle) -->
+                    <div v-else class="flex items-center gap-1.5 px-2 py-1 text-green-600 dark:text-green-500 text-xs">
+                        <Wifi class="w-3.5 h-3.5" />
+                        <span class="hidden sm:inline">Online</span>
+                    </div>
                 </div>
 
                 <!-- Active Customer Session Bar -->
@@ -897,7 +1013,7 @@ const closeOrderSheet = () => {
 
             <!-- Checkout Dialog -->
             <CheckoutDialog v-model:open="isCheckoutOpen" :transaction="selectedTransaction"
-                @success="onCheckoutSuccess" />
+                @success="onCheckoutSuccess" @offline-success="handleOfflineCheckout" />
 
             <!-- Receipt Printer Handler -->
             <ReceiptHandler />

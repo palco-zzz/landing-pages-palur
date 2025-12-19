@@ -78,6 +78,7 @@ class PosController extends Controller
     public function store(Request $request)
     {
         $request->validate([
+            'uuid' => 'required|string|max:100',
             'customer_name' => 'required|string|max:255',
             'items' => 'required|array|min:1',
             'items.*.menu_id' => 'required|exists:menus,id',
@@ -86,11 +87,20 @@ class PosController extends Controller
             'items.*.subtotal' => 'required|integer|min:0',
         ]);
 
+        // IDEMPOTENCY CHECK: Return existing transaction if UUID already exists
+        $existing = Transaction::where('uuid', $request->uuid)->first();
+        if ($existing) {
+            return redirect()->back()
+                ->with('success', "Pesanan untuk {$existing->customer_name} sudah ada (duplikat dicegah).")
+                ->with('existing_transaction', $existing);
+        }
+
         try {
             DB::beginTransaction();
 
-            // Create the transaction
+            // Create the transaction with frontend-provided UUID
             $transaction = Transaction::create([
+                'uuid' => $request->uuid,
                 'user_id' => auth()->id(),
                 'customer_name' => $request->customer_name,
                 'status' => 'unpaid',
@@ -134,6 +144,98 @@ class PosController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->back()->with('error', 'Gagal membuat pesanan: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Sync offline transactions (batch upload).
+     * Accepts an array of orders from the frontend when internet reconnects.
+     */
+    public function sync(Request $request)
+    {
+        $request->validate([
+            'orders' => 'required|array|min:1',
+            'orders.*.uuid' => 'required|string|max:100',
+            'orders.*.customer_name' => 'required|string|max:255',
+            'orders.*.items' => 'required|array|min:1',
+            'orders.*.items.*.menu_id' => 'required|exists:menus,id',
+            'orders.*.items.*.quantity' => 'required|integer|min:1',
+            'orders.*.items.*.price' => 'required|integer|min:0',
+            'orders.*.items.*.subtotal' => 'required|integer|min:0',
+            'orders.*.created_at' => 'nullable|date',
+        ]);
+
+        $syncedCount = 0;
+        $skippedCount = 0;
+        $errors = [];
+
+        try {
+            DB::beginTransaction();
+
+            foreach ($request->orders as $index => $order) {
+                try {
+                    // IDEMPOTENCY CHECK: Skip if UUID already exists
+                    $existing = Transaction::where('uuid', $order['uuid'])->first();
+                    if ($existing) {
+                        $skippedCount++;
+                        continue; // Skip this order, already exists
+                    }
+
+                    // Use frontend timestamp if provided, otherwise use now()
+                    $createdAt = isset($order['created_at']) 
+                        ? \Carbon\Carbon::parse($order['created_at']) 
+                        : now();
+
+                    // Create the transaction with frontend-provided UUID
+                    $transaction = Transaction::create([
+                        'uuid' => $order['uuid'],
+                        'user_id' => auth()->id(),
+                        'customer_name' => $order['customer_name'],
+                        'status' => 'unpaid',
+                        'total_amount' => 0,
+                        'created_at' => $createdAt,
+                        'updated_at' => $createdAt,
+                    ]);
+
+                    // Create transaction items
+                    foreach ($order['items'] as $item) {
+                        TransactionItem::create([
+                            'transaction_id' => $transaction->id,
+                            'menu_id' => $item['menu_id'],
+                            'quantity' => $item['quantity'],
+                            'price' => $item['price'],
+                            'subtotal' => $item['subtotal'],
+                            'is_printed' => false,
+                            'created_at' => $createdAt,
+                            'updated_at' => $createdAt,
+                        ]);
+                    }
+
+                    // Recalculate total
+                    $transaction->recalculateTotal();
+
+                    $syncedCount++;
+                } catch (\Exception $e) {
+                    $errors[] = "Order #{$index}: " . $e->getMessage();
+                }
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'status' => 'success',
+                'synced_count' => $syncedCount,
+                'errors' => $errors,
+                'message' => "{$syncedCount} pesanan offline berhasil disinkronkan.",
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'status' => 'error',
+                'synced_count' => 0,
+                'message' => 'Gagal menyinkronkan pesanan: ' . $e->getMessage(),
+            ], 500);
         }
     }
 
