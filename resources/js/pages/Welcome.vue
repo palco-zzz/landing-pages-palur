@@ -36,7 +36,8 @@ const menuItems = [
         category: 'makanan',
         title: 'Mie Lethek Godog',
         price: '16K',
-        image: 'https://images.unsplash.com/photo-1626804475297-411dbe64fc3b?q=80&w=800&auto=format&fit=crop',
+        // image: 'https://images.unsplash.com/photo-1626804475297-411dbe64fc3b?q=80&w=800&auto=format&fit=crop',
+        image: '/images/gambarsatu.png',
         description: 'Mie singkong rebus dengan kuah kaldu kental gurih, dimasak arang.',
         badge: 'Signature',
         badgeColor: 'text-amber-400 border-amber-500/20'
@@ -52,7 +53,7 @@ const menuItems = [
         category: 'makanan',
         title: 'Bakmi Jowo Godog',
         price: '16K',
-        image: 'https://images.unsplash.com/photo-1596450523090-e51c88746c87?q=80&w=800&auto=format&fit=crop',
+        image: '/images/bakmijowo.png',
         description: 'Mie kuning telur rebus kuah kaldu ayam kampung segar.',
         badge: 'Best Seller',
         badgeColor: 'text-amber-400 border-amber-500/20'
@@ -68,7 +69,7 @@ const menuItems = [
         category: 'makanan',
         title: 'Nasi Goreng Jowo',
         price: '16K',
-        image: 'https://images.unsplash.com/photo-1603133872878-684f208fb74b?q=80&w=800&auto=format&fit=crop',
+        image: '/images/nasigoreng.png',
         description: 'Nasi goreng tradisional, dimasak tanpa saos tomat, warna coklat alami.'
     },
     {
@@ -98,14 +99,15 @@ const menuItems = [
         category: 'makanan',
         title: 'Nasi Putih',
         price: '4K',
-        image: 'https://images.unsplash.com/photo-1536304993881-ffc02132e7f3?q=80&w=800&auto=format&fit=crop',
+        image: 'https://images.unsplash.com/photo-1536304993881-ff6e9eefa2a6?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+        // image: 'https://images.unsplash.com/photo-1536304993881-ffc02132e7f3?q=80&w=800&auto=format&fit=crop',
         description: 'Nasi putih pulen hangat.'
     },
     {
         category: 'minuman',
         title: 'Wedang Uwuh',
         price: '8K',
-        image: 'https://images.unsplash.com/photo-1596710629179-4fdde5938896?q=80&w=800&auto=format&fit=crop',
+        image: '/images/wedanguwuh.jpg',
         description: 'Minuman herbal khas Imogiri: Jahe, Secang, Cengkeh, Kayu Manis.'
     },
     {
@@ -133,7 +135,7 @@ const menuItems = [
         category: 'minuman',
         title: 'Kopi Hitam',
         price: '4K',
-        image: 'https://images.unsplash.com/photo-1551033406-611cf9a28f67?q=80&w=800&auto=format&fit=crop',
+        image: 'https://plus.unsplash.com/premium_photo-1723559972702-2659e41dbb5b?q=80&w=736&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
         description: 'Kopi tubruk tradisional yang pekat dan mantap.'
     },
     {
@@ -216,7 +218,7 @@ const scrollTo = (id: string) => {
                 <a href="#" class="text-lg font-medium tracking-tighter text-white flex items-center gap-2"
                     aria-label="Mie Lethek Palur Home">
                     <UtensilsCrossed class="w-5 h-5 text-amber-500" />
-                    PALUR.
+                    Mie Lethek Palur.
                 </a>
 
                 <!-- Desktop Menu -->
@@ -376,8 +378,7 @@ const scrollTo = (id: string) => {
                         <div class="flex-1 w-full">
                             <div class="grid grid-cols-2 gap-2">
                                 <div class="h-24 rounded-lg bg-zinc-800 border border-white/5 overflow-hidden">
-                                    <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=800&auto=format&fit=crop"
-                                        alt="Interior Warung Bakmi"
+                                    <img src="/images/gambarruangan.png" alt="Interior Warung Bakmi"
                                         class="w-full h-full object-cover opacity-70 hover:opacity-100 transition-opacity">
                                 </div>
                                 <div class="h-24 rounded-lg bg-zinc-800 border border-white/5 overflow-hidden">
@@ -437,10 +438,9 @@ const scrollTo = (id: string) => {
 
                 <!-- Menu Grid -->
                 <!-- Use transition-group for filtering animation -->
-                <TransitionGroup name="menu-list" tag="div"
-                    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <div v-for="item in filteredItems" :key="item.title" @click="openModal(item)"
-                        class="group cursor-pointer h-full rounded-2xl bg-zinc-900/50 border border-white/5 p-4 hover:border-amber-500/30 transition-all duration-300 hover:bg-zinc-900 hover:-translate-y-1">
+                        class="menu-card group cursor-pointer h-full rounded-2xl bg-zinc-900/50 border border-white/5 p-4 hover:border-amber-500/30">
                         <div class="aspect-video w-full rounded-xl bg-zinc-800 mb-4 overflow-hidden relative">
                             <img :src="item.image" :alt="item.title"
                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-80 group-hover:opacity-100">
@@ -457,7 +457,7 @@ const scrollTo = (id: string) => {
                         </div>
                         <p class="text-xs text-zinc-500 leading-relaxed line-clamp-2">{{ item.description }}</p>
                     </div>
-                </TransitionGroup>
+                </div>
 
             </div>
         </section>
@@ -634,10 +634,25 @@ const scrollTo = (id: string) => {
 }
 
 .glass-nav {
-    background: rgba(9, 9, 11, 0.8);
+    background: rgba(9, 9, 11, 0.82);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.menu-card {
+    transition: border-color 0.2s ease,
+        background-color 0.2s ease;
+}
+
+@media (hover: hover) {
+    .menu-card:hover {
+        background-color: rgb(24, 24, 27);
+    }
+}
+
+.menu-card:active {
+    transform: scale(0.98);
 }
 
 /* Animations */
@@ -655,23 +670,5 @@ const scrollTo = (id: string) => {
         opacity: 1;
         transform: translateY(0);
     }
-}
-
-/* Menu List Transition */
-.menu-list-move,
-.menu-list-enter-active,
-.menu-list-leave-active {
-    transition: all 0.5s ease;
-}
-
-.menu-list-enter-from,
-.menu-list-leave-to {
-    opacity: 0;
-    transform: translateY(30px);
-}
-
-.menu-list-leave-active {
-    position: absolute;
-    /* Ensures smooth reflow when removing items */
 }
 </style>
