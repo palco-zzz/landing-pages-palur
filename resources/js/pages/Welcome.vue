@@ -512,7 +512,7 @@ const scrollTo = (id: string) => {
                     <div
                         class="h-[400px] w-full rounded-3xl overflow-hidden border border-white/10 relative group bg-zinc-900">
                         <iframe
-                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3955.031525997677!2d110.85249157499709!3d-7.5715783924424365!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e7a16fbd9d0c24b%3A0x6b484501a37c35e!2sPalur%20Plaza!5e0!3m2!1sen!2sid!4v1709623849123!5m2!1sen!2sid"
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d494.38!2d110.8766222!3d-7.5704936!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e7a17e0cfc9e189%3A0xd10dd7fdf3294c23!2sMIE%20LETHEK%20PALUR%20PERTAMA!5e0!3m2!1sid!2sid!4v1703152800000!5m2!1sid!2sid"
                             title="Lokasi Mie Lethek Palur" width="100%" height="100%" style="border:0;"
                             allowfullscreen="true" loading="lazy"
                             class="opacity-60 group-hover:opacity-100 transition-opacity duration-500 invert-[.9] grayscale contrast-[.85]"></iframe>
