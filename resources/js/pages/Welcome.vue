@@ -36,7 +36,6 @@ const menuItems = [
         category: 'makanan',
         title: 'Mie Lethek Godog',
         price: '16K',
-        // image: 'https://images.unsplash.com/photo-1626804475297-411dbe64fc3b?q=80&w=800&auto=format&fit=crop',
         image: '/images/gambarsatu.webp',
         description: 'Mie singkong rebus dengan kuah kaldu kental gurih, dimasak arang.',
         badge: 'Signature',
@@ -46,14 +45,14 @@ const menuItems = [
         category: 'makanan',
         title: 'Mie Lethek Goreng',
         price: '16K',
-        image: 'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?q=80&w=800&auto=format&fit=crop',
+        image: 'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?q=80&w=600&auto=format,compress&fit=crop',
         description: 'Mie singkong goreng dengan bumbu rempah dan kecap manis pas.'
     },
     {
         category: 'makanan',
         title: 'Bakmi Jowo Godog',
         price: '16K',
-        image: '/images/bakmijowo.png',
+        image: '/images/bakmijowo.webp',
         description: 'Mie kuning telur rebus kuah kaldu ayam kampung segar.',
         badge: 'Best Seller',
         badgeColor: 'text-amber-400 border-amber-500/20'
@@ -62,7 +61,7 @@ const menuItems = [
         category: 'makanan',
         title: 'Bakmi Jowo Goreng',
         price: '16K',
-        image: 'https://images.unsplash.com/photo-1555126634-323283e090fa?q=80&w=800&auto=format&fit=crop',
+        image: 'https://images.unsplash.com/photo-1555126634-323283e090fa?q=80&w=600&auto=format,compress&fit=crop',
         description: 'Mie kuning goreng nyemek dengan aroma sangit arang yang khas.'
     },
     {
@@ -76,21 +75,21 @@ const menuItems = [
         category: 'makanan',
         title: 'Nasi Goreng Mawut',
         price: '16K',
-        image: 'https://images.unsplash.com/photo-1512058564366-18510be2db19?q=80&w=800&auto=format&fit=crop',
+        image: 'https://images.unsplash.com/photo-1512058564366-18510be2db19?q=80&w=600&auto=format,compress&fit=crop',
         description: 'Campuran nasi goreng dan mie lethek, porsi mantap mengenyangkan.'
     },
     {
         category: 'makanan',
         title: 'Nasi Godog',
         price: '16K',
-        image: 'https://images.unsplash.com/photo-1543826173-70651703c5a4?q=80&w=800&auto=format&fit=crop',
+        image: 'https://images.unsplash.com/photo-1543826173-70651703c5a4?q=80&w=600&auto=format,compress&fit=crop',
         description: 'Nasi berkuah kaldu dengan sayuran dan suwiran ayam, hangat di perut.'
     },
     {
         category: 'makanan',
         title: 'Rica-rica Ayam',
         price: '25K',
-        image: 'https://images.unsplash.com/photo-1565557623262-b51c2513a641?q=80&w=800&auto=format&fit=crop',
+        image: 'https://images.unsplash.com/photo-1565557623262-b51c2513a641?q=80&w=600&auto=format,compress&fit=crop',
         description: 'Potongan ayam kampung dengan bumbu pedas manis meresap.',
         badge: 'Spesial',
         badgeColor: 'text-amber-400 border-amber-500/20'
@@ -99,8 +98,7 @@ const menuItems = [
         category: 'makanan',
         title: 'Nasi Putih',
         price: '4K',
-        image: 'https://images.unsplash.com/photo-1536304993881-ff6e9eefa2a6?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-        // image: 'https://images.unsplash.com/photo-1536304993881-ffc02132e7f3?q=80&w=800&auto=format&fit=crop',
+        image: 'https://images.unsplash.com/photo-1536304993881-ff6e9eefa2a6?q=80&w=600&auto=format,compress&fit=crop',
         description: 'Nasi putih pulen hangat.'
     },
     {
@@ -114,56 +112,56 @@ const menuItems = [
         category: 'minuman',
         title: 'Wedang Uwuh Susu',
         price: '10K',
-        image: 'https://images.unsplash.com/photo-1544787219-7f47ccb76574?q=80&w=800&auto=format&fit=crop',
+        image: 'https://images.unsplash.com/photo-1544787219-7f47ccb76574?q=80&w=600&auto=format,compress&fit=crop',
         description: 'Kombinasi wedang rempah hangat dengan susu kental manis.'
     },
     {
         category: 'minuman',
         title: 'Teh Manis (Panas/Es)',
         price: '4K',
-        image: 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?q=80&w=800&auto=format&fit=crop',
+        image: 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?q=80&w=600&auto=format,compress&fit=crop',
         description: 'Teh seduh asli dengan gula batu (Panas/Dingin).'
     },
     {
         category: 'minuman',
         title: 'Jeruk (Panas/Es)',
         price: '5K',
-        image: 'https://images.unsplash.com/photo-1613478223719-2ab802602423?q=80&w=800&auto=format&fit=crop',
+        image: 'https://images.unsplash.com/photo-1613478223719-2ab802602423?q=80&w=600&auto=format,compress&fit=crop',
         description: 'Perasan jeruk segar asli, kaya vitamin C.'
     },
     {
         category: 'minuman',
         title: 'Kopi Hitam',
         price: '4K',
-        image: 'https://plus.unsplash.com/premium_photo-1723559972702-2659e41dbb5b?q=80&w=736&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+        image: 'https://plus.unsplash.com/premium_photo-1723559972702-2659e41dbb5b?q=80&w=600&auto=format,compress&fit=crop',
         description: 'Kopi tubruk tradisional yang pekat dan mantap.'
     },
     {
         category: 'minuman',
         title: 'Lemon Tea',
         price: '5K',
-        image: 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?q=80&w=800&auto=format&fit=crop',
+        image: 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?q=80&w=600&auto=format,compress&fit=crop',
         description: 'Kesegaran teh dengan potongan lemon asli.'
     },
     {
         category: 'tambahan',
         title: 'Kepala Ayam',
         price: '5K',
-        image: 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?q=80&w=800&auto=format&fit=crop',
+        image: 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?q=80&w=600&auto=format,compress&fit=crop',
         description: 'Bacem kepala ayam yang gurih manis.'
     },
     {
         category: 'tambahan',
         title: 'Sayap Ayam',
         price: '5K',
-        image: 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?q=80&w=800&auto=format&fit=crop',
+        image: 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?q=80&w=600&auto=format,compress&fit=crop',
         description: 'Bacem sayap ayam yang empuk.'
     },
     {
         category: 'tambahan',
         title: 'Telor Ceplok/Dadar',
         price: '4K',
-        image: 'https://images.unsplash.com/photo-1565557623262-b51c2513a641?q=80&w=800&auto=format&fit=crop',
+        image: 'https://images.unsplash.com/photo-1565557623262-b51c2513a641?q=80&w=600&auto=format,compress&fit=crop',
         description: 'Tambahan lauk telur goreng sesuai selera.'
     }
 ];
@@ -207,6 +205,7 @@ const scrollTo = (id: string) => {
     <Head title="Bakmi Jowo & Mie Lethek Palur - Pertama di Surakarta">
         <meta name="description"
             content="Nikmati Bakmi Jowo & Mie Lethek Palur pertama di Surakarta. Resep otentik, dimasak arang, 100% tanpa micin/MSG." />
+        <link rel="preconnect" href="https://images.unsplash.com" crossorigin="anonymous" />
     </Head>
 
     <div class="min-h-screen bg-zinc-950 text-zinc-200 selection:bg-amber-500/30 selection:text-amber-200 font-sans">
@@ -332,8 +331,9 @@ const scrollTo = (id: string) => {
                         </div>
                         <div
                             class="mt-8 w-full h-48 rounded-xl bg-zinc-900 overflow-hidden border border-white/5 relative">
-                            <img src="https://images.unsplash.com/photo-1552611052-33e04de081de?q=80&w=1600&auto=format&fit=crop"
-                                alt="Suasana Makan Mie Lethek Palur"
+                            <img src="https://images.unsplash.com/photo-1552611052-33e04de081de?q=80&w=800&auto=format,compress&fit=crop"
+                                alt="Suasana Makan Mie Lethek Palur" width="800" height="400" loading="eager"
+                                fetchpriority="high" decoding="async"
                                 class="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-700">
                         </div>
                     </div>
@@ -378,12 +378,14 @@ const scrollTo = (id: string) => {
                         <div class="flex-1 w-full">
                             <div class="grid grid-cols-2 gap-2">
                                 <div class="h-24 rounded-lg bg-zinc-800 border border-white/5 overflow-hidden">
-                                    <img src="/images/gambarruangan.webp" alt="Interior Warung Bakmi"
+                                    <img src="/images/gambarruangan.webp" alt="Interior Warung Bakmi" width="400"
+                                        height="200" loading="lazy" decoding="async"
                                         class="w-full h-full object-cover opacity-70 hover:opacity-100 transition-opacity">
                                 </div>
                                 <div class="h-24 rounded-lg bg-zinc-800 border border-white/5 overflow-hidden">
-                                    <img src="https://images.unsplash.com/photo-1555126634-323283e090fa?q=80&w=800&auto=format&fit=crop"
-                                        alt="Memasak Bakmi Jowo"
+                                    <img src="https://images.unsplash.com/photo-1555126634-323283e090fa?q=80&w=400&auto=format,compress&fit=crop"
+                                        alt="Memasak Bakmi Jowo" width="400" height="200" loading="lazy"
+                                        decoding="async"
                                         class="w-full h-full object-cover opacity-70 hover:opacity-100 transition-opacity">
                                 </div>
                             </div>
@@ -442,7 +444,8 @@ const scrollTo = (id: string) => {
                     <div v-for="item in filteredItems" :key="item.title" @click="openModal(item)"
                         class="menu-card group cursor-pointer h-full rounded-2xl bg-zinc-900/50 border border-white/5 p-4 hover:border-amber-500/30">
                         <div class="aspect-video w-full rounded-xl bg-zinc-800 mb-4 overflow-hidden relative">
-                            <img :src="item.image" :alt="item.title"
+                            <img :src="item.image" :alt="item.title" width="400" height="225" loading="lazy"
+                                decoding="async"
                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-80 group-hover:opacity-100">
                             <div v-if="item.badge"
                                 class="absolute top-2 right-2 px-2 py-1 bg-black/60 backdrop-blur-md rounded-lg text-xs font-medium border"
@@ -513,8 +516,8 @@ const scrollTo = (id: string) => {
                         class="h-[400px] w-full rounded-3xl overflow-hidden border border-white/10 relative group bg-zinc-900">
                         <iframe
                             src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d494.38!2d110.8766222!3d-7.5704936!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e7a17e0cfc9e189%3A0xd10dd7fdf3294c23!2sMIE%20LETHEK%20PALUR%20PERTAMA!5e0!3m2!1sid!2sid!4v1703152800000!5m2!1sid!2sid"
-                            title="Lokasi Mie Lethek Palur" width="100%" height="100%" style="border:0;"
-                            allowfullscreen="true" loading="lazy"
+                            title="Lokasi Mie Lethek Palur" width="100%" height="100%" style="border:0;" allowfullscreen
+                            loading="lazy"
                             class="opacity-60 group-hover:opacity-100 transition-opacity duration-500 invert-[.9] grayscale contrast-[.85]"></iframe>
                         <div class="absolute inset-0 pointer-events-none border border-white/5 rounded-3xl z-10"></div>
                     </div>
@@ -578,7 +581,8 @@ const scrollTo = (id: string) => {
                             <div class="p-6">
                                 <div class="flex flex-col items-center">
                                     <div class="w-full h-48 rounded-xl bg-zinc-800 overflow-hidden mb-4 relative">
-                                        <img :src="selectedItem.image" :alt="selectedItem.title"
+                                        <img :src="selectedItem.image" :alt="selectedItem.title" width="600"
+                                            height="400" loading="lazy" decoding="async"
                                             class="w-full h-full object-cover">
                                         <div class="absolute inset-0 bg-gradient-to-t from-zinc-900/60 to-transparent">
                                         </div>

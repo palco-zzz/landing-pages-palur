@@ -28,8 +28,9 @@ const submit = () => {
         <!-- Left Column - Visual Branding (Desktop Only) -->
         <div class="hidden lg:flex w-1/2 relative bg-zinc-900 items-center justify-center overflow-hidden">
             <!-- Background Image -->
-            <img src="https://images.unsplash.com/photo-1591064663354-7247a582c290?q=80&w=1374&auto=format&fit=crop"
-                alt="Mie Lethek Palur" class="absolute inset-0 w-full h-full object-cover" />
+            <img src="https://images.unsplash.com/photo-1591064663354-7247a582c290?q=80&w=1200&auto=format,compress&fit=crop"
+                alt="Mie Lethek Palur" width="1200" height="800" loading="eager" fetchpriority="high" decoding="async"
+                class="absolute inset-0 w-full h-full object-cover" />
 
             <!-- Gradient Overlay -->
             <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
@@ -44,7 +45,7 @@ const submit = () => {
                 <div class="mb-8 inline-block">
                     <div
                         class="w-24 h-24 mx-auto rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 shadow-2xl flex items-center justify-center p-3">
-                        <img src="/images/logo-bakmi-palur.png" alt="Mie Lethek Palur Logo"
+                        <img src="/images/logo-bakmi-palur.webp" alt="Mie Lethek Palur Logo" width="96" height="96"
                             class="w-full h-full object-contain" />
                     </div>
                 </div>
@@ -77,7 +78,7 @@ const submit = () => {
                 <div class="lg:hidden text-center mb-8">
                     <div
                         class="w-20 h-20 mx-auto rounded-xl bg-amber-50 border border-amber-100 shadow-lg flex items-center justify-center p-2 mb-4">
-                        <img src="/images/logo-bakmi-palur.png" alt="Mie Lethek Palur Logo"
+                        <img src="/images/logo-bakmi-palur.webp" alt="Mie Lethek Palur Logo" width="80" height="80"
                             class="w-full h-full object-contain" />
                     </div>
                     <h2 class="text-xl font-bold text-gray-900">Mie Lethek Palur</h2>

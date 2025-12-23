@@ -54,4 +54,14 @@ export default defineConfig({
             }
         }),
     ],
+    build: {
+        rollupOptions: {
+            output: {
+                manualChunks: {
+                    'vendor-vue': ['vue', '@inertiajs/vue3'],
+                    'vendor-icons': ['lucide-vue-next'],
+                },
+            },
+        },
+    },
 });
