@@ -37,7 +37,7 @@ const menuItems = [
         title: 'Mie Lethek Godog',
         price: '16K',
         // image: 'https://images.unsplash.com/photo-1626804475297-411dbe64fc3b?q=80&w=800&auto=format&fit=crop',
-        image: '/images/gambarsatu.png',
+        image: '/images/gambarsatu.webp',
         description: 'Mie singkong rebus dengan kuah kaldu kental gurih, dimasak arang.',
         badge: 'Signature',
         badgeColor: 'text-amber-400 border-amber-500/20'
@@ -69,7 +69,7 @@ const menuItems = [
         category: 'makanan',
         title: 'Nasi Goreng Jowo',
         price: '16K',
-        image: '/images/nasigoreng.png',
+        image: '/images/nasigoreng.webp',
         description: 'Nasi goreng tradisional, dimasak tanpa saos tomat, warna coklat alami.'
     },
     {
@@ -107,7 +107,7 @@ const menuItems = [
         category: 'minuman',
         title: 'Wedang Uwuh',
         price: '8K',
-        image: '/images/wedanguwuh.jpg',
+        image: '/images/wedanguwuh.webp',
         description: 'Minuman herbal khas Imogiri: Jahe, Secang, Cengkeh, Kayu Manis.'
     },
     {
@@ -378,7 +378,7 @@ const scrollTo = (id: string) => {
                         <div class="flex-1 w-full">
                             <div class="grid grid-cols-2 gap-2">
                                 <div class="h-24 rounded-lg bg-zinc-800 border border-white/5 overflow-hidden">
-                                    <img src="/images/gambarruangan.png" alt="Interior Warung Bakmi"
+                                    <img src="/images/gambarruangan.webp" alt="Interior Warung Bakmi"
                                         class="w-full h-full object-cover opacity-70 hover:opacity-100 transition-opacity">
                                 </div>
                                 <div class="h-24 rounded-lg bg-zinc-800 border border-white/5 overflow-hidden">
