@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Category;
 use App\Models\Menu;
 use App\Models\User;
 use Illuminate\Database\Seeder;
@@ -46,6 +47,18 @@ class PosSeeder extends Seeder
      */
     private function seedMenuItems(): void
     {
+        // Create categories first
+        $catMakanan = Category::create(['name' => 'Makanan']);
+        $catMinuman = Category::create(['name' => 'Minuman']);
+        $catTambahan = Category::create(['name' => 'Tambahan']);
+
+        // Map category names to their IDs
+        $categories = [
+            'makanan' => $catMakanan->id,
+            'minuman' => $catMinuman->id,
+            'tambahan' => $catTambahan->id,
+        ];
+
         $menuItems = [
             // Category: Makanan
             ['name' => 'Mie Lethek Godog', 'category' => 'makanan', 'price' => 16000],
@@ -75,9 +88,8 @@ class PosSeeder extends Seeder
         foreach ($menuItems as $item) {
             Menu::create([
                 'name' => $item['name'],
-                'category' => $item['category'],
+                'category_id' => $categories[$item['category']],
                 'price' => $item['price'],
-                'is_available' => true,
             ]);
         }
     }
