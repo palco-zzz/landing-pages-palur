@@ -15,17 +15,32 @@ import {
     LogOut,
     Settings,
     ChevronRight,
+    X,
 } from 'lucide-vue-next';
 import {
-    Sheet,
-    SheetContent,
-    SheetTrigger,
-} from '@/components/ui/sheet';
+    Drawer,
+    DrawerClose,
+    DrawerContent,
+    DrawerTrigger,
+} from '@/components/ui/drawer';
 
 const page = usePage();
 const user = computed(() => (page.props.auth as { user: { role?: string; name: string; email: string } })?.user);
 const isAdmin = computed(() => user.value?.role === 'admin');
 const isOpen = ref(false);
+
+// Check if any drawer menu route is active (for "Lainnya" button highlight)
+const isDrawerMenuActive = computed(() => {
+    return route().current('categories.*') ||
+        route().current('menus.*') ||
+        route().current('users.*') ||
+        route().current('profile.*');
+});
+
+// Check if profile route is active (for cashier "Profil" button highlight)
+const isProfileActive = computed(() => {
+    return route().current('profile.*');
+});
 
 // Helper to safely get route
 const getRoute = (name: string) => {
@@ -79,32 +94,36 @@ const handleSheetClose = () => {
                 <span class="text-[10px] font-medium mt-1">Laporan</span>
             </Link>
 
-            <!-- MORE MENU (SHEET) -->
-            <Sheet v-model:open="isOpen">
-                <SheetTrigger as-child>
+            <!-- MORE MENU (DRAWER) -->
+            <Drawer v-model:open="isOpen">
+                <DrawerTrigger as-child>
                     <button
                         class="flex flex-col items-center justify-center gap-1 transition-colors hover:text-zinc-300 w-full"
-                        :class="isOpen ? 'text-orange-500' : 'text-zinc-500'">
+                        :class="isOpen || isDrawerMenuActive ? 'text-orange-500' : 'text-zinc-500'">
                         <MenuIcon class="w-6 h-6 transition-transform active:scale-95"
-                            :class="isOpen ? 'stroke-[2.5]' : 'stroke-2'" />
+                            :class="isOpen || isDrawerMenuActive ? 'stroke-[2.5]' : 'stroke-2'" />
                         <span class="text-[10px] font-medium mt-1">Lainnya</span>
                     </button>
-                </SheetTrigger>
-                <SheetContent side="bottom"
-                    class="h-[85vh] rounded-t-[2rem] border-zinc-800 bg-zinc-950 text-white p-0">
+                </DrawerTrigger>
+                <DrawerContent class="h-[85vh] rounded-t-[2rem] border-zinc-800 bg-zinc-950 text-white p-0">
                     <div class="p-6 pb-2 border-b border-zinc-800/50">
-                        <div class="flex items-center justify-center mb-6">
-                            <div class="w-12 h-1 bg-zinc-800 rounded-full"></div>
-                        </div>
-                        <div class="flex items-center gap-4 mb-4">
-                            <div
-                                class="w-12 h-12 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-500 font-bold text-xl">
-                                {{ user?.name.charAt(0).toUpperCase() }}
+                        <div class="flex items-center justify-between mb-4 mt-6">
+                            <div class="flex items-center gap-4">
+                                <div
+                                    class="w-12 h-12 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-500 font-bold text-xl">
+                                    {{ user?.name.charAt(0).toUpperCase() }}
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-lg">{{ user?.name }}</h3>
+                                    <p class="text-sm text-zinc-500">{{ user?.email }}</p>
+                                </div>
                             </div>
-                            <div>
-                                <h3 class="font-bold text-lg">{{ user?.name }}</h3>
-                                <p class="text-sm text-zinc-500">{{ user?.email }}</p>
-                            </div>
+                            <DrawerClose as-child>
+                                <button
+                                    class="p-2 rounded-full hover:bg-zinc-800 active:bg-zinc-700 transition-colors text-zinc-400 hover:text-zinc-200">
+                                    <X class="w-5 h-5" />
+                                </button>
+                            </DrawerClose>
                         </div>
                     </div>
 
@@ -168,8 +187,8 @@ const handleSheetClose = () => {
                             </div>
                         </Link>
                     </div>
-                </SheetContent>
-            </Sheet>
+                </DrawerContent>
+            </Drawer>
         </template>
 
         <!-- CASHIER NAVIGATION -->
@@ -190,32 +209,36 @@ const handleSheetClose = () => {
                 </div>
             </Link>
 
-            <!-- MORE MENU (SHEET) -->
-            <Sheet v-model:open="isOpen">
-                <SheetTrigger as-child>
+            <!-- MORE MENU (DRAWER) -->
+            <Drawer v-model:open="isOpen">
+                <DrawerTrigger as-child>
                     <button
                         class="flex flex-col items-center justify-center gap-1 transition-colors hover:text-zinc-300 w-full"
-                        :class="isOpen ? 'text-orange-500' : 'text-zinc-500'">
+                        :class="isOpen || isProfileActive ? 'text-orange-500' : 'text-zinc-500'">
                         <User class="w-6 h-6 transition-transform active:scale-95"
-                            :class="isOpen ? 'stroke-[2.5]' : 'stroke-2'" />
+                            :class="isOpen || isProfileActive ? 'stroke-[2.5]' : 'stroke-2'" />
                         <span class="text-[10px] font-medium mt-1">Profil</span>
                     </button>
-                </SheetTrigger>
-                <SheetContent side="bottom"
-                    class="h-[60vh] rounded-t-[2rem] border-zinc-800 bg-zinc-950 text-white p-0">
+                </DrawerTrigger>
+                <DrawerContent class="h-[60vh] rounded-t-[2rem] border-zinc-800 bg-zinc-950 text-white p-0">
                     <div class="p-6 pb-2 border-b border-zinc-800/50">
-                        <div class="flex items-center justify-center mb-6">
-                            <div class="w-12 h-1 bg-zinc-800 rounded-full"></div>
-                        </div>
-                        <div class="flex items-center gap-4 mb-4">
-                            <div
-                                class="w-12 h-12 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-500 font-bold text-xl">
-                                {{ user?.name.charAt(0).toUpperCase() }}
+                        <div class="flex items-center justify-between mb-4 mt-6">
+                            <div class="flex items-center gap-4">
+                                <div
+                                    class="w-12 h-12 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-500 font-bold text-xl">
+                                    {{ user?.name.charAt(0).toUpperCase() }}
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-lg">{{ user?.name }}</h3>
+                                    <p class="text-sm text-zinc-500">{{ user?.email }}</p>
+                                </div>
                             </div>
-                            <div>
-                                <h3 class="font-bold text-lg">{{ user?.name }}</h3>
-                                <p class="text-sm text-zinc-500">{{ user?.email }}</p>
-                            </div>
+                            <DrawerClose as-child>
+                                <button
+                                    class="p-2 rounded-full hover:bg-zinc-800 active:bg-zinc-700 transition-colors text-zinc-400 hover:text-zinc-200">
+                                    <X class="w-5 h-5" />
+                                </button>
+                            </DrawerClose>
                         </div>
                     </div>
 
@@ -241,8 +264,8 @@ const handleSheetClose = () => {
                             </div>
                         </Link>
                     </div>
-                </SheetContent>
-            </Sheet>
+                </DrawerContent>
+            </Drawer>
         </template>
     </nav>
 </template>
